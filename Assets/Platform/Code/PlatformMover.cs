@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Platform {
     public class PlatformMover : MonoBehaviour {
-        [SerializeField, Range(0, 2)]  private float xAmplitude,    zAmplitude;
+        [SerializeField, Range(0, 2)] private float xAmplitude, zAmplitude;
         [SerializeField, Range(1, 15)] private float xRotation = 1, zRotation = 1;
 
         void Update() {

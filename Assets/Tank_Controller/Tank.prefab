@@ -153,6 +153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35a1ea7dae114eb49853d7874a115bcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  state: 0
   turnSpeed: 0.1
   tankRotationSpeed: 60
   currSpeed: 0

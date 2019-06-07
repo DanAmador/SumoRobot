@@ -260,12 +260,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35a1ea7dae114eb49853d7874a115bcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  state: 0
   turnSpeed: 20
+  rotationRate: 0
+  turnRotationAngle: 0
+  turnRotationSeekSpeed: 0
+  state: 0
   currSpeed: 0
   specialCounter: 0
-  hoverForce: 65
-  hoverHeight: 3.5
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -598,23 +599,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7202223383700237936, guid: 38771111e37af2d488a189e37cbabe33,
-        type: 3}
-      propertyPath: m_Constraints
-      value: 80
-      objectReference: {fileID: 0}
-    - target: {fileID: 2035671392, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
-      propertyPath: currSpeed
-      value: 90
-      objectReference: {fileID: 0}
-    - target: {fileID: 2035671392, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
-      propertyPath: hoverHeight
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 2035671392, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
-      propertyPath: turnSpeed
-      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 38771111e37af2d488a189e37cbabe33, type: 3}

@@ -19,7 +19,7 @@ namespace Tank_Controller {
             forwardInput = Input.GetAxis($"Vertical{playerNum}");
             rotationInput = Input.GetAxis($"Horizontal{playerNum}");
             turbo = Input.GetButtonDown($"Turbo{playerNum}");
-            block = Input.GetButtonDown($"Block{playerNum}");
+            block = Input.GetButton($"Block{playerNum}");
         }
     }
 }

@@ -50,7 +50,9 @@ namespace Tank_Controller {
                 }
 
                 if (_input.Block) {
-                    StartCoroutine(BlockRoutine());
+                    if (specialCounter > 3) {
+                        StartCoroutine(BlockRoutine());
+                    }
                 }
             }
 
@@ -60,8 +62,9 @@ namespace Tank_Controller {
             }
         }
 
+
         void FixedUpdate() {
-            if (_rb && _input) {
+            if (_rb && _input && _thrusters) {
                 HandleMovement();
             }
         }
@@ -76,7 +79,7 @@ namespace Tank_Controller {
                 _rb.drag = 1;
 
                 Vector3 forwardForce = currSpeed * _input.ForwardInput * transform.forward;
-                forwardForce = Time.deltaTime * _rb.mass * forwardForce;
+                forwardForce = Time.deltaTime * _rb.mass * forwardForce; 
                 _rb.AddForce(forwardForce);
             }
             else {
@@ -90,7 +93,7 @@ namespace Tank_Controller {
             _rb.AddTorque(turnTorque);
 
             Vector3 newRotation = transform.eulerAngles;
-            newRotation.z = Mathf.SmoothDampAngle(newRotation.z, _input.ForwardInput * -turnRotationAngle,
+            newRotation.z = Mathf.SmoothDampAngle(newRotation.z, _input.RotationInput* -turnRotationAngle,
                 ref _rotationVelocity, turnRotationSeekSpeed);
             transform.eulerAngles = newRotation;
         }
@@ -99,6 +102,19 @@ namespace Tank_Controller {
         void OnCollisionEnter(Collision collision) {
             if (collision.gameObject.CompareTag("Player")) {
                 TankController collider = collision.gameObject.GetComponent<TankController>();
+                if (collider.state == TankState.BLOCK) {
+                    collision.rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+                    _rb.AddForce(collision.impulse/Time.deltaTime);
+                }
+            }
+        }
+
+        private void OnCollisionExit(Collision collision) {
+            if (collision.gameObject.CompareTag("Player")) {
+                TankController collider = collision.gameObject.GetComponent<TankController>();
+                if (collider.state == TankState.BLOCK) {
+                    collision.rigidbody.constraints = RigidbodyConstraints.None;
+                }
             }
         }
 
@@ -107,26 +123,29 @@ namespace Tank_Controller {
 
         private IEnumerator BlockRoutine() {
             state = TankState.BLOCK;
-            _rb.constraints = RigidbodyConstraints.FreezeAll;
+            
             yield return new WaitUntil(BlockPredicate);
 
             state = TankState.NORMAL;
-            _rb.constraints = RigidbodyConstraints.None;
         }
 
         private bool BlockPredicate() {
+            _rb.AddForce(-_rb.velocity);
+            _rb.velocity = Vector3.zero;
+            _rb.position = transform.position;
+            specialCounter -= Time.deltaTime * 5;
             return !_input.Block || specialCounter <= 0;
         }
 
         private IEnumerator TurboBoost(float currentSpecial) {
-            float fraction = currentSpecial / MAX_SPECIAL;
+            float fraction = (currentSpecial * currentSpecial) / MAX_SPECIAL;
             state = TankState.BOOST;
-            currSpeed = currSpeed + (MAX_SPEED * fraction);
-            yield return new WaitForSeconds(0.2f);
+            currSpeed = currSpeed + MAX_SPEED * fraction;
+            yield return new WaitForSeconds(1);
 
             state = TankState.NORMAL;
             specialCounter = 0;
-            currSpeed = MAX_SPECIAL;
+            currSpeed = MAX_SPEED;
         }
 
         #endregion

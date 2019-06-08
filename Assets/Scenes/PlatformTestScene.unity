@@ -278,14 +278,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1068371885, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
-      propertyPath: strength
-      value: 250
-      objectReference: {fileID: 0}
-    - target: {fileID: 1068371885, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
-      propertyPath: distance
-      value: 3
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
 --- !u!1001 &1213664488
@@ -355,77 +347,45 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8123455157296611820, guid: 64c4aa7ceaddc59448b07d62d8a05953,
+    - target: {fileID: 6714630655843511118, guid: 64c4aa7ceaddc59448b07d62d8a05953,
         type: 3}
-      propertyPath: m_LocalScale.x
-      value: 100
+      propertyPath: m_IsTrigger
+      value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 8123455157296611820, guid: 64c4aa7ceaddc59448b07d62d8a05953,
+    - target: {fileID: 6477347500952071272, guid: 64c4aa7ceaddc59448b07d62d8a05953,
         type: 3}
-      propertyPath: m_LocalScale.z
-      value: 100
+      propertyPath: m_IsTrigger
+      value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 8123455157296611821, guid: 64c4aa7ceaddc59448b07d62d8a05953,
+    - target: {fileID: 2293808492026208469, guid: 64c4aa7ceaddc59448b07d62d8a05953,
         type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
-    - target: {fileID: 8123455157296611822, guid: 64c4aa7ceaddc59448b07d62d8a05953,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: d9faca20310ae7d41b4dd3029be20d36, type: 2}
-    - target: {fileID: 8123455157296611811, guid: 64c4aa7ceaddc59448b07d62d8a05953,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
+      propertyPath: m_IsTrigger
+      value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 8123455157296611823, guid: 64c4aa7ceaddc59448b07d62d8a05953,
+    - target: {fileID: 8113145535134108545, guid: 64c4aa7ceaddc59448b07d62d8a05953,
         type: 3}
-      propertyPath: m_Material
-      value: 
-      objectReference: {fileID: 13400000, guid: 7b2bb3cd248a7b54fb668502b854f4f4,
-        type: 2}
-    - target: {fileID: 6463163434178113785, guid: 64c4aa7ceaddc59448b07d62d8a05953,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.5
+      propertyPath: m_IsTrigger
+      value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 6463163434178113785, guid: 64c4aa7ceaddc59448b07d62d8a05953,
+    - target: {fileID: 4115226704255606997, guid: 64c4aa7ceaddc59448b07d62d8a05953,
         type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.5
+      propertyPath: m_IsTrigger
+      value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 8967087913969627008, guid: 64c4aa7ceaddc59448b07d62d8a05953,
+    - target: {fileID: 6955569676897678701, guid: 64c4aa7ceaddc59448b07d62d8a05953,
         type: 3}
-      propertyPath: m_TagString
-      value: Death
+      propertyPath: m_IsTrigger
+      value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 2523689995873821455, guid: 64c4aa7ceaddc59448b07d62d8a05953,
+    - target: {fileID: 2722183634534256794, guid: 64c4aa7ceaddc59448b07d62d8a05953,
         type: 3}
-      propertyPath: m_Enabled
-      value: 0
+      propertyPath: m_IsTrigger
+      value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 2523689995873821455, guid: 64c4aa7ceaddc59448b07d62d8a05953, type: 3}
-    - {fileID: 6855396347366228678, guid: 64c4aa7ceaddc59448b07d62d8a05953, type: 3}
+    - target: {fileID: 9006998993882163480, guid: 64c4aa7ceaddc59448b07d62d8a05953,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 64c4aa7ceaddc59448b07d62d8a05953, type: 3}
---- !u!1 &1734726849 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8967087913969627008, guid: 64c4aa7ceaddc59448b07d62d8a05953,
-    type: 3}
-  m_PrefabInstance: {fileID: 1213664488}
-  m_PrefabAsset: {fileID: 0}
---- !u!65 &1734726851
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1734726849}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 10, y: 1, z: 10}
-  m_Center: {x: 0, y: 0, z: 0}

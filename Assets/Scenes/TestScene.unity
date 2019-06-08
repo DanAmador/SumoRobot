@@ -160,7 +160,6 @@ MonoBehaviour:
   turnRotationAngle: 0
   turnRotationSeekSpeed: 0
   state: 2
-  specialCounter: 0
 --- !u!114 &581615304
 MonoBehaviour:
   m_ObjectHideFlags: 0

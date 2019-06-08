@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 46969057}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Thrusters
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -43,7 +43,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 186549536}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Thruster (2)
   m_TagString: Untagged
   m_Icon: {fileID: 4162164826716764455, guid: 0000000000000000d000000000000000, type: 0}
@@ -74,9 +74,9 @@ GameObject:
   m_Component:
   - component: {fileID: 963194228}
   - component: {fileID: 963194227}
-  - component: {fileID: 963194226}
-  m_Layer: 0
-  m_Name: Main Camera
+  - component: {fileID: 264753364}
+  m_Layer: 8
+  m_Name: TrackCamera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -89,13 +89,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.24373701, y: -0.010634987, z: -0.038560856, w: 0.9690162}
-  m_LocalPosition: {x: 0.31340218, y: 4.6091056, z: -8.368721}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7202223383700237939}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 28.135002, y: -2.561, z: -5.2000003}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &963194227
 Camera:
   m_ObjectHideFlags: 0
@@ -139,14 +139,22 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &963194226
-AudioListener:
+--- !u!114 &264753364
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3788e649b59f034a993d2c74b369622, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  distanceUp: 4.09
+  distanceBack: -6.6
+  minimumHeight: 4.39
 --- !u!1 &1042684518
 GameObject:
   m_ObjectHideFlags: 0
@@ -156,7 +164,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1042684519}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Thruster (3)
   m_TagString: Untagged
   m_Icon: {fileID: 4162164826716764455, guid: 0000000000000000d000000000000000, type: 0}
@@ -186,7 +194,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1128865589}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Thruster (1)
   m_TagString: Untagged
   m_Icon: {fileID: 4162164826716764455, guid: 0000000000000000d000000000000000, type: 0}
@@ -216,7 +224,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1129536735}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Thruster
   m_TagString: Untagged
   m_Icon: {fileID: 4162164826716764455, guid: 0000000000000000d000000000000000, type: 0}
@@ -249,7 +257,7 @@ GameObject:
   - component: {fileID: 7202223383102763771}
   - component: {fileID: 7202223383102763768}
   - component: {fileID: 7202223383102763769}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -341,7 +349,7 @@ GameObject:
   - component: {fileID: 2035671392}
   - component: {fileID: 2035671393}
   - component: {fileID: 1068371885}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Tank
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -395,10 +403,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   turnSpeed: 5
   rotationRate: 49.56
-  turnRotationAngle: 25
-  turnRotationSeekSpeed: 0.25
+  turnRotationAngle: 15
+  turnRotationSeekSpeed: 0.2
   state: 0
-  specialCounter: 0
 --- !u!114 &2035671393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -424,8 +431,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2726dca53b2e20847b65d5d65a762f85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  strength: 170
-  distance: 4
+  strength: 250
+  distance: 3
   thrusters:
   - {fileID: 1129536735}
   - {fileID: 1128865589}

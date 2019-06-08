@@ -17,10 +17,10 @@ namespace Tank_Controller {
         public TankState state;
 
         [Range(3, 10)] private const float MAX_SPECIAL = 5;
-        [Range(700, 2000)] private const float MAX_SPEED = 1500;
+        [Range(500, 1000)] private const float MAX_SPEED = 1000;
         [Range(150, 500)] private const float START_SPEED = 200;
-        [SerializeField] private float currSpeed, specialCounter;
-        private float _rotationVelocity, _groundAngleVelocity;
+        [SerializeField] private float specialCounter;
+        private float _currSpeed, _rotationVelocity, _groundAngleVelocity;
 
         private Rigidbody _rb;
         private TankInputs _input;
@@ -37,12 +37,14 @@ namespace Tank_Controller {
             _input = GetComponent<TankInputs>();
             _thrusters = GetComponent<Thruster>();
             state = TankState.NORMAL;
+            _currSpeed = START_SPEED;
+
         }
 
         private void Update() {
             specialCounter = Mathf.Clamp(specialCounter + Time.deltaTime, 0, MAX_SPECIAL);
             if (state == TankState.NORMAL) {
-                currSpeed = Mathf.Clamp(currSpeed + Mathf.Abs(_input.ForwardInput) * currSpeed * Time.deltaTime, 1,
+                _currSpeed = Mathf.Clamp(_currSpeed + Mathf.Abs(_input.ForwardInput) * _currSpeed * Time.deltaTime, 1,
                     MAX_SPEED);
 
                 if (_input.Turbo) {
@@ -58,7 +60,7 @@ namespace Tank_Controller {
 
 
             if (state == TankState.COLLIDED) {
-                currSpeed = START_SPEED;
+                _currSpeed = START_SPEED;
             }
         }
 
@@ -75,10 +77,11 @@ namespace Tank_Controller {
         #region Custom Code
 
         protected virtual void HandleMovement() {
-            if (Physics.Raycast(transform.position, transform.up * -1, _thrusters.distance + 3)) {
-                _rb.drag = 1;
+            float drift_modifier = _input.Drift ? 0.5f : 1;
 
-                Vector3 forwardForce = currSpeed * _input.ForwardInput * transform.forward;
+            if (Physics.Raycast(transform.position, transform.up * -1, _thrusters.distance + 3)) {
+                _rb.drag = 1 * (1 / drift_modifier) ;
+                Vector3 forwardForce = _currSpeed * _input.ForwardInput * drift_modifier*transform.forward;
                 forwardForce = Time.deltaTime * _rb.mass * forwardForce; 
                 _rb.AddForce(forwardForce);
             }
@@ -87,7 +90,7 @@ namespace Tank_Controller {
             }
 
 
-            Vector3 turnTorque = rotationRate * _input.RotationInput * Vector3.up;
+            Vector3 turnTorque = rotationRate * _input.RotationInput  * (1 / drift_modifier) * Vector3.up;
 
             turnTorque = Time.deltaTime * _rb.mass * turnTorque;
             _rb.AddTorque(turnTorque);
@@ -100,16 +103,20 @@ namespace Tank_Controller {
 
 
         void OnCollisionEnter(Collision collision) {
+            if(state == TankState.BLOCK) return;
             if (collision.gameObject.CompareTag("Player")) {
                 TankController collider = collision.gameObject.GetComponent<TankController>();
                 if (collider.state == TankState.BLOCK) {
                     collision.rigidbody.constraints = RigidbodyConstraints.FreezeAll;
-                    _rb.AddForce(collision.impulse/Time.deltaTime);
+                    _rb.AddForce((-collision.impulse/Time.deltaTime) * 2);
                 }
+
+                _currSpeed = START_SPEED;
             }
         }
 
         private void OnCollisionExit(Collision collision) {
+            if(state == TankState.BLOCK) return;
             if (collision.gameObject.CompareTag("Player")) {
                 TankController collider = collision.gameObject.GetComponent<TankController>();
                 if (collider.state == TankState.BLOCK) {
@@ -140,12 +147,12 @@ namespace Tank_Controller {
         private IEnumerator TurboBoost(float currentSpecial) {
             float fraction = (currentSpecial * currentSpecial) / MAX_SPECIAL;
             state = TankState.BOOST;
-            currSpeed = currSpeed + MAX_SPEED * fraction;
+            _currSpeed = _currSpeed + MAX_SPEED * fraction;
             yield return new WaitForSeconds(1);
 
             state = TankState.NORMAL;
             specialCounter = 0;
-            currSpeed = MAX_SPEED;
+            _currSpeed = MAX_SPEED;
         }
 
         #endregion

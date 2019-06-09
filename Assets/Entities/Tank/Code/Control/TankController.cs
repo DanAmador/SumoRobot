@@ -9,8 +9,7 @@ namespace Tank {
     public class TankController : MonoBehaviour {
         #region Variables
 
-        [Header("Movement Properties")] public float turnSpeed = 5f;
-        public float rotationRate, turnRotationAngle, turnRotationSeekSpeed;
+        [Header("Movement Properties")] public float rotationRate, turnRotationAngle, turnRotationSeekSpeed;
 
         public TankState state;
 
@@ -20,15 +19,22 @@ namespace Tank {
         private float _rotationVelocity, _groundAngleVelocity;
 
 
+        public Vector3 lastCollisionImpulse;
+        public TankInputs _input;
         public float currSpeed { get; private set; }
         public float specialCounter { get; private set; }
 
         private Rigidbody _rb;
-        private TankInputs _input;
         private Thruster _thrusters;
 
+        private Vector3 initialPos;
+        private Quaternion initialRot;
 
         #region Getters
+
+        public float getNormalizedSpeed() {
+            return (currSpeed - START_SPEED) / (MAX_SPEED - START_SPEED);
+        }
 
         #endregion
 
@@ -41,8 +47,19 @@ namespace Tank {
             _rb = GetComponent<Rigidbody>();
             _input = GetComponent<TankInputs>();
             _thrusters = GetComponent<Thruster>();
+            currSpeed = START_SPEED;
+            initialPos = transform.position;
+            initialRot = transform.rotation;
+        }
+
+
+        public void Reset() {
+            transform.position = initialPos;
+            transform.rotation = initialRot;
             state = TankState.NORMAL;
             currSpeed = START_SPEED;
+            specialCounter = 0;
+            lastCollisionImpulse = Vector3.zero;
         }
 
         private void Update() {
@@ -62,36 +79,45 @@ namespace Tank {
                     }
                 }
             }
-
-
-            if (state == TankState.COLLIDED) {
-                currSpeed = START_SPEED;
-            }
         }
 
 
         void FixedUpdate() {
+            if (state == TankState.COLLIDED) {
+                state = TankState.NORMAL;
+                currSpeed = START_SPEED;
+            }
+
             if (_rb && _input && _thrusters) {
                 HandleMovement();
             }
         }
 
-        private void OnTriggerEnter(Collider other) {
-            if (other.gameObject.CompareTag("Death")) {
-                Debug.Log("nani");
-            }
-        }
+        #region Collider Events
 
         void OnCollisionEnter(Collision collision) {
-            if (state == TankState.BLOCK) return;
+            if (state == TankState.BLOCK) {
+                lastCollisionImpulse = collision.impulse;
+                return;
+            }
+
             if (collision.gameObject.CompareTag("Player")) {
                 TankController collider = collision.gameObject.GetComponent<TankController>();
                 if (collider.state == TankState.BLOCK) {
+                    state = TankState.COLLIDED;
                     collision.rigidbody.constraints = RigidbodyConstraints.FreezeAll;
                     _rb.AddForce((-collision.impulse / Time.deltaTime) * 2);
                 }
+                else {
+                    lastCollisionImpulse = collision.impulse;
+                    collider.state = TankState.COLLIDED;
+                }
 
                 currSpeed = START_SPEED;
+            }
+
+            if (collision.gameObject.CompareTag("Death")) {
+                state = TankState.DEAD;
             }
         }
 
@@ -104,6 +130,8 @@ namespace Tank {
                 }
             }
         }
+
+        #endregion
 
         #endregion
 
@@ -147,9 +175,12 @@ namespace Tank {
             Vector3[] directions = {transform.forward, transform.right, transform.right * -1};
             Debug.DrawRay(transform.position, transform.forward * 2000000);
             foreach (Vector3 direction in directions) {
-                if (Physics.Raycast(transform.position, transform.forward, out hit, 2000000)) {
+                if (Physics.Raycast(transform.position, direction, out hit, 2000000)) {
                     if (hit.collider.isTrigger) {
                         toReturn.Add(hit.point - transform.position);
+                    }
+                    else {
+                        toReturn.Add(Vector3.zero);
                     }
                 }
                 else {

@@ -1,23 +1,35 @@
-﻿using System.Collections.Generic;
+﻿using Platform;
 using Tank;
 using UnityEngine;
 
 namespace GameSession {
     public class GameSessionManager : MonoBehaviour {
-        public TankController[] players;
+        private TankController[] tanks;
+        private PlatformMover platform;
 
-        private void Start() {
-            players = GetComponentsInChildren<TankController>();
+        public void Awake() {
+            tanks = GetComponentsInChildren<TankController>();
+            platform = GetComponentInChildren<PlatformMover>();
         }
 
-
-        public TankController[] getEnemies(TankController player) {
-            List<TankController> enemies = new List<TankController>();
-            foreach (TankController tank in players) {
-                if (!tank.Equals(player)) enemies.Add(tank);
+        public TankController getEnemy(TankController player) {
+            if (tanks == null)
+                tanks =
+                    GetComponentsInChildren<TankController>(); //Idk why it sometimes crashes thanks to the ml agents
+            foreach (TankController tank in tanks) {
+                if (!tank.Equals(player)) return tank;
             }
 
-            return enemies.ToArray();
+            return null;
+        }
+
+        public void Reset() {
+            Debug.Log("RESET");
+            foreach (TankController tank in tanks) {
+                tank.Reset();
+            }
+
+            platform.Reset();
         }
     }
 }

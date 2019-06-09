@@ -349,6 +349,7 @@ GameObject:
   - component: {fileID: 2035671392}
   - component: {fileID: 2035671393}
   - component: {fileID: 1068371885}
+  - component: {fileID: 956303407}
   m_Layer: 8
   m_Name: Tank
   m_TagString: Player
@@ -406,6 +407,7 @@ MonoBehaviour:
   turnRotationAngle: 15
   turnRotationSeekSpeed: 0.2
   state: 0
+  _input: {fileID: 0}
 --- !u!114 &2035671393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -438,3 +440,23 @@ MonoBehaviour:
   - {fileID: 1128865589}
   - {fileID: 186549536}
   - {fileID: 1042684519}
+--- !u!114 &956303407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7202223383700237942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48fb3ff4a206323478c105938c9db9a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  brain: {fileID: 11400000, guid: 73f8f23c8a4b44a2915078bed1e2d801, type: 2}
+  agentParameters:
+    agentCameras: []
+    agentRenderTextures: []
+    maxStep: 0
+    resetOnDone: 1
+    onDemandDecision: 0
+    numberOfActionsBetweenDecisions: 1

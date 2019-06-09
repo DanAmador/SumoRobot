@@ -1,8 +1,9 @@
 namespace Tank {
     public enum TankState {
-        BOOST,
         NORMAL,
+        BOOST,
         BLOCK,
-        COLLIDED
+        COLLIDED,
+        DEAD
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Tank {
     public class TankInputs : MonoBehaviour {
-        public bool player_control = true;
+        public bool playerControl = true;
         private float forwardInput, rotationInput;
         private bool turbo, block, drift;
         private int playerNum = 1;
@@ -38,8 +38,8 @@ namespace Tank {
         }
 
         protected virtual void HandleInputs() {
-            if (!player_control) return;
-            
+            if (!playerControl) return;
+
             forwardInput = Input.GetAxis($"Vertical{playerNum}");
             rotationInput = Input.GetAxis($"Horizontal{playerNum}");
             turbo = Input.GetButtonDown($"Turbo{playerNum}");

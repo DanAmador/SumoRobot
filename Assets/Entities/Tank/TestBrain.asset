@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TestBrain
   m_EditorClassIdentifier: 
   brainParameters:
-    vectorObservationSize: 38
+    vectorObservationSize: 39
     numStackedVectorObservations: 10
     vectorActionSize: 05000000
     cameraResolutions: []

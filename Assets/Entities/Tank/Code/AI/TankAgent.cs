@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using GameSession;
 using MLAgents;
 using UnityEngine;
@@ -6,6 +7,8 @@ using UnityEngine;
 namespace Tank.AI {
     public class TankAgent : Agent {
         private TankController _tank, enemy;
+        private TankAgent enemyAgent;
+        private Academy _academy;
         public GameSessionManager gs;
         private TankInputs _input;
 
@@ -16,6 +19,8 @@ namespace Tank.AI {
             _input.playerControl = false;
 
             enemy = gs.getEnemy(_tank);
+            enemyAgent = enemy.GetComponent<TankAgent>();
+            _academy = FindObjectOfType<Academy>();
         }
 
         public override void CollectObservations() {
@@ -49,9 +54,7 @@ namespace Tank.AI {
 
         public override void AgentAction(float[] vectorAction, string textAction) {
             if (enemy.state == TankState.DEAD || _tank.state == TankState.DEAD) {
-                Debug.Log("They be ded ");
-                Done();
-                return;
+                StartCoroutine(WaitBeforeReset());
             }
 
             _input.ForwardInput = vectorAction[0];
@@ -63,9 +66,9 @@ namespace Tank.AI {
             float totalReward = 0;
             float distance = Vector3.Distance(enemy.transform.position, _tank.transform.position);
             totalReward += (distance / 50000);
-            if (_tank.state == TankState.NORMAL) totalReward += -0.001f;
-            if (_tank.state == TankState.BLOCK) totalReward += 0.01f * _tank.specialCounter;
-            if (_tank.state == TankState.BOOST) totalReward += 0.001f * _tank.specialCounter;
+//            if (_tank.state == TankState.NORMAL) totalReward += -0.001f;
+            if (_tank.state == TankState.BLOCK) totalReward += 0.0001f * _tank.specialCounter;
+            if (_tank.state == TankState.BOOST) totalReward += 0.0001f * _tank.specialCounter;
             if (_tank.state == TankState.COLLIDED) totalReward += -0.1f;
 
             if (_tank.lastCollisionImpulse != Vector3.zero) {
@@ -77,15 +80,22 @@ namespace Tank.AI {
             if (_tank.state == TankState.DEAD) totalReward -= 1;
 
             AddReward(totalReward);
-            if (_tank.state == TankState.DEAD) {
-                Debug.Log("should end ");
-                enemy.GetComponent<TankAgent>().Done();
-                Done();
-            }
+        }
+
+        private IEnumerator WaitBeforeReset() {
+            yield return new WaitForSeconds(.5f);
+            enemyAgent.Done();
+            Done();
         }
 
         public override void AgentReset() {
             gs.Reset();
+
+            if (_academy.GetType() == typeof(TankTackleAcademy)) {
+                Vector3 rand = UnityEngine.Random.onUnitSphere * ((TankTackleAcademy) _academy).EnemySpawnVariance;
+                rand.y = 0;
+                enemy.transform.position = rand;
+            }
         }
     }
 }

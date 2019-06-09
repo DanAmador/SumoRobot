@@ -238,7 +238,7 @@ PrefabInstance:
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4.4
+      value: 0.5999994
       objectReference: {fileID: 0}
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
@@ -248,7 +248,7 @@ PrefabInstance:
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 29.5
+      value: 29.599998
       objectReference: {fileID: 0}
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
@@ -339,16 +339,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1169435221}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b5dd737cc647b343b23338b360d14a2, type: 3}
+  m_Script: {fileID: 11500000, guid: 3ace89b32f1caf6459319b645a5d9283, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   broadcastHub:
     broadcastingBrains:
-    - {fileID: 11400000, guid: 73f8f23c8a4b44a2915078bed1e2d801, type: 2}
-    - {fileID: 11400000, guid: 93de719ecb70dd6488129510e1071b4d, type: 2}
+    - {fileID: 11400000, guid: c5e7319704b40b545af559a0e0d7a0e3, type: 2}
     _brainsToControl:
-    - {fileID: 11400000, guid: 73f8f23c8a4b44a2915078bed1e2d801, type: 2}
-  maxSteps: 10000
+    - {fileID: 11400000, guid: c5e7319704b40b545af559a0e0d7a0e3, type: 2}
+  maxSteps: 0
   trainingConfiguration:
     width: 80
     height: 80
@@ -362,7 +361,10 @@ MonoBehaviour:
     timeScale: 1
     targetFrameRate: 60
   resetParameters:
-    resetParameters: []
+    resetParameters:
+    - key: EnemySpawnVariance
+      value: 0
+  EnemySpawnVariance: 0
 --- !u!4 &1169435223
 Transform:
   m_ObjectHideFlags: 0
@@ -536,7 +538,7 @@ PrefabInstance:
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4.9
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
@@ -546,7 +548,7 @@ PrefabInstance:
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -47.3
+      value: -47.2
       objectReference: {fileID: 0}
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}

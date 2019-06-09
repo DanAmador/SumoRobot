@@ -8,7 +8,7 @@ default:
   hidden_units: 128
   lambd: 0.95
   learning_rate: 3.0e-4
-  max_steps: 5.0e4
+  max_steps: 5.0e6
   memory_size: 256
   normalize: false
   num_epoch: 3
@@ -25,7 +25,6 @@ default:
 SumoTankLearning:
   use_curiosity: true
   curiosity_strength: 0.01
-  max_steps: 5.0e4
   batch_size: 128
   buffer_size: 2048
   beta: 1.0e-2

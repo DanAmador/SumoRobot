@@ -60,6 +60,10 @@ namespace Tank {
             currSpeed = START_SPEED;
             specialCounter = 0;
             lastCollisionImpulse = Vector3.zero;
+            _rb.velocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
+            _rb.position = initialPos;
+            _rb.rotation = initialRot;
         }
 
         private void Update() {
@@ -173,8 +177,9 @@ namespace Tank {
             List<Vector3> toReturn = new List<Vector3>();
             RaycastHit hit;
             Vector3[] directions = {transform.forward, transform.right, transform.right * -1};
-            Debug.DrawRay(transform.position, transform.forward * 2000000);
             foreach (Vector3 direction in directions) {
+                Debug.DrawRay(transform.position, direction * 2000);
+
                 if (Physics.Raycast(transform.position, direction, out hit, 2000000)) {
                     if (hit.collider.isTrigger) {
                         toReturn.Add(hit.point - transform.position);

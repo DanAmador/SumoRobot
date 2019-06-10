@@ -33,7 +33,7 @@ namespace Tank.AI {
             Transform tankTransform = _tank.transform;
             Vector3 normalized = tankTransform.rotation.eulerAngles / 360.0f; // [0,1]
 
-            float rayDistance = 25;
+            float rayDistance = 40;
             float[] rayAngles = {0f, 45f, 90f, 135f, 180f, 110f, 70f};
 
             AddVectorObs(_rayPerception.Perceive(rayDistance, rayAngles, new[] {"Death", "Player"}, 0f, 0f));

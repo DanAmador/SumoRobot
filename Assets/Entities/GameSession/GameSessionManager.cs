@@ -24,7 +24,6 @@ namespace GameSession {
         }
 
         public void Reset() {
-            Debug.Log("RESET");
             foreach (TankController tank in tanks) {
                 tank.Reset();
             }

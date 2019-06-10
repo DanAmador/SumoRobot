@@ -1,11 +1,9 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Tank {
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(TankInputs))]
-    [RequireComponent(typeof(Thruster))]
     public class TankController : MonoBehaviour {
         #region Variables
 
@@ -46,8 +44,9 @@ namespace Tank {
         void Start() {
             _rb = GetComponent<Rigidbody>();
             _input = GetComponent<TankInputs>();
-            _thrusters = GetComponent<Thruster>();
+            _thrusters = GetComponentInChildren<Thruster>();
             currSpeed = START_SPEED;
+            state = TankState.NORMAL;
             initialPos = transform.position;
             initialRot = transform.rotation;
         }
@@ -67,7 +66,6 @@ namespace Tank {
         }
 
         private void Update() {
-            getRaycastDistance();
             specialCounter = Mathf.Clamp(specialCounter + Time.deltaTime, 0, MAX_SPECIAL);
             if (state == TankState.NORMAL) {
                 currSpeed = Mathf.Clamp(currSpeed + Mathf.Abs(_input.ForwardInput) * currSpeed * Time.deltaTime, 1,
@@ -172,29 +170,6 @@ namespace Tank {
         #endregion
 
         #region ObservationHelper
-
-        public List<Vector3> getRaycastDistance() {
-            List<Vector3> toReturn = new List<Vector3>();
-            RaycastHit hit;
-            Vector3[] directions = {transform.forward, transform.right, transform.right * -1};
-            foreach (Vector3 direction in directions) {
-                Debug.DrawRay(transform.position, direction * 2000);
-
-                if (Physics.Raycast(transform.position, direction, out hit, 2000000)) {
-                    if (hit.collider.isTrigger) {
-                        toReturn.Add(hit.point - transform.position);
-                    }
-                    else {
-                        toReturn.Add(Vector3.zero);
-                    }
-                }
-                else {
-                    toReturn.Add(Vector3.zero);
-                }
-            }
-
-            return toReturn;
-        }
 
         #endregion
 

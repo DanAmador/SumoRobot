@@ -350,6 +350,7 @@ GameObject:
   - component: {fileID: 2035671393}
   - component: {fileID: 1068371885}
   - component: {fileID: 956303407}
+  - component: {fileID: 1736622618}
   m_Layer: 8
   m_Name: Tank
   m_TagString: Player
@@ -402,11 +403,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35a1ea7dae114eb49853d7874a115bcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnSpeed: 5
   rotationRate: 49.56
   turnRotationAngle: 15
   turnRotationSeekSpeed: 0.2
   state: 0
+  onEdge: 0
+  lastCollisionImpulse: {x: 0, y: 0, z: 0}
   _input: {fileID: 0}
 --- !u!114 &2035671393
 MonoBehaviour:
@@ -420,7 +422,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64b2554ce16b09c45b75f83267c704ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player_control: 1
+  playerControl: 1
 --- !u!114 &1068371885
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -452,11 +454,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48fb3ff4a206323478c105938c9db9a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  brain: {fileID: 11400000, guid: 73f8f23c8a4b44a2915078bed1e2d801, type: 2}
+  brain: {fileID: 11400000, guid: c5e7319704b40b545af559a0e0d7a0e3, type: 2}
   agentParameters:
     agentCameras: []
     agentRenderTextures: []
-    maxStep: 0
+    maxStep: 10000
     resetOnDone: 1
     onDemandDecision: 0
     numberOfActionsBetweenDecisions: 1
+  gs: {fileID: 0}
+--- !u!114 &1736622618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7202223383700237942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb172294dbbcc408286b156a2c4b553c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

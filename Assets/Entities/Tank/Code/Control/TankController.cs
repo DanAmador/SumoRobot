@@ -15,7 +15,7 @@ namespace Tank {
         [Range(500, 1000)] private const float MAX_SPEED = 1000;
         [Range(150, 500)] private const float START_SPEED = 200;
         private float _rotationVelocity, _groundAngleVelocity;
-
+        public bool onEdge;
 
         public Vector3 lastCollisionImpulse;
         public TankInputs _input;
@@ -130,6 +130,25 @@ namespace Tank {
                 if (collider.state == TankState.BLOCK) {
                     collision.rigidbody.constraints = RigidbodyConstraints.None;
                 }
+            }
+        }
+
+
+        private void OnTriggerEnter(Collider other) {
+            if (other.gameObject.CompareTag("Edge")) {
+                onEdge = true;
+            }
+        }
+
+        private void OnTriggerStay(Collider other) {
+            if (other.gameObject.CompareTag("Edge")) {
+                onEdge = true;
+            }
+        }
+
+        private void OnTriggerExit(Collider other) {
+            if (other.gameObject.CompareTag("Edge")) {
+                onEdge = false;
             }
         }
 

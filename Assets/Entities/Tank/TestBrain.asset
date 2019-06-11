@@ -13,17 +13,15 @@ MonoBehaviour:
   m_Name: TestBrain
   m_EditorClassIdentifier: 
   brainParameters:
-    vectorObservationSize: 53
+    vectorObservationSize: 52
     numStackedVectorObservations: 10
-    vectorActionSize: 05000000
+    vectorActionSize: 040000000400000003000000
     cameraResolutions: []
     vectorActionDescriptions:
     - Forward
     - Rotation
-    - Drift
-    - Turbo
-    - Block
-    vectorActionSpaceType: 1
+    - Buttons
+    vectorActionSpaceType: 0
   keyContinuousPlayerActions: []
   axisContinuousPlayerActions: []
   discretePlayerActions: []

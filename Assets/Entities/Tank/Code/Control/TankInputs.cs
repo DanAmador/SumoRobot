@@ -39,7 +39,6 @@ namespace Tank {
 
         protected virtual void HandleInputs() {
             if (!playerControl) return;
-
             forwardInput = Input.GetAxis($"Vertical{playerNum}");
             rotationInput = Input.GetAxis($"Horizontal{playerNum}");
             turbo = Input.GetButtonDown($"Turbo{playerNum}");

@@ -13,16 +13,14 @@ MonoBehaviour:
   m_Name: SumoTackleLearn
   m_EditorClassIdentifier: 
   brainParameters:
-    vectorObservationSize: 53
-    numStackedVectorObservations: 5
-    vectorActionSize: 05000000
+    vectorObservationSize: 52
+    numStackedVectorObservations: 10
+    vectorActionSize: 050000000500000004000000
     cameraResolutions: []
     vectorActionDescriptions:
     - Forward
     - Rotation
-    - Drift
-    - Turbo
-    - Block
-    vectorActionSpaceType: 1
+    - Buttons
+    vectorActionSpaceType: 0
   model: {fileID: 0}
-  inferenceDevice: 0
+  inferenceDevice: 1

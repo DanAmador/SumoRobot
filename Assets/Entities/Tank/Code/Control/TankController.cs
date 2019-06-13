@@ -15,7 +15,7 @@ namespace Tank {
         [Range(500, 1000)] private const float MAX_SPEED = 1000;
         [Range(150, 500)] private const float START_SPEED = 200;
         private float _rotationVelocity, _groundAngleVelocity;
-        public bool onEdge;
+        public bool onEdge, reflectedFlag;
 
         public Vector3 lastCollisionImpulse;
         public TankInputs _input;
@@ -75,7 +75,9 @@ namespace Tank {
                     MAX_SPEED);
 
                 if (_input.Turbo) {
-                    StartCoroutine(TurboBoost(specialCounter));
+                    if (specialCounter > 2) {
+                        StartCoroutine(TurboBoost(specialCounter));
+                    }
                 }
 
                 if (_input.Block) {
@@ -116,6 +118,7 @@ namespace Tank {
                 else {
                     lastCollisionImpulse = collision.impulse;
                     collider.state = TankState.COLLIDED;
+                    reflectedFlag = true;
                 }
 
                 currSpeed = START_SPEED;

@@ -12,6 +12,8 @@ namespace Tank.AI {
         public GameSessionManager gs;
         private TankInputs _input;
         private RayPerception3D _rayPerception;
+        private bool collectReward;
+        private float lastDistance;
 
         public override void InitializeAgent() {
             base.InitializeAgent();
@@ -23,6 +25,8 @@ namespace Tank.AI {
             enemyAgent = enemy.GetComponent<TankAgent>();
             _rayPerception = GetComponent<RayPerception3D>();
             _academy = FindObjectOfType<TankAcademy>();
+            collectReward = true;
+            lastDistance = Vector3.Distance(enemy.transform.position, _tank.transform.position);
         }
 
         public override void CollectObservations() {
@@ -34,9 +38,10 @@ namespace Tank.AI {
             Vector3 normalized = tankTransform.rotation.eulerAngles / 360.0f; // [0,1]
 
             float rayDistance = 50;
-            float[] rayAngles = {0f, 45f, 90f, 135f, 180f, 110f, 70f, 270};
-
-            AddVectorObs(_rayPerception.Perceive(rayDistance, rayAngles, new[] {"Edge", "Player"}, 0f, 0f));
+            float[] rayAngles = {0f, 45f, 70f, 90f, 135f, 180f, 110f, 270};
+            String[] observables = {"Edge", "Player"};
+            AddVectorObs(_rayPerception.Perceive(rayDistance, rayAngles, observables, 0f, 0f));
+            AddVectorObs(_rayPerception.Perceive(rayDistance / 2, rayAngles, observables, 0f, 0f));
 
 
             AddVectorObs(normalized);
@@ -56,7 +61,7 @@ namespace Tank.AI {
 
         public override void AgentAction(float[] vectorAction, string textAction) {
             if (enemy.state == TankState.DEAD || _tank.state == TankState.DEAD) {
-                StartCoroutine(WaitBeforeReset());
+                StartCoroutine(WaitBeforeReset(0));
             }
 
             int forward = Mathf.FloorToInt(vectorAction[0]);
@@ -65,32 +70,31 @@ namespace Tank.AI {
 
             if (forward == 1) _input.ForwardInput = 1;
             if (forward == 2) _input.ForwardInput = -1;
-            if (forward == 3) _input.ForwardInput = .5f;
-            if (forward == 4) _input.ForwardInput = -.5f;
 
             if (rotation == 1) _input.RotationInput = 1;
             if (rotation == 2) _input.RotationInput = -1;
-            if (rotation == 3) _input.RotationInput = .5f;
-            if (rotation == 4) _input.RotationInput = -.5f;
 
             _input.Drift = button == 1;
             _input.Turbo = button == 2;
             _input.Block = button == 3;
 
 
-            float totalReward = _academy.trainingTackle ? TackleReward() : NormalReward();
-            Vector3 vecTo = (enemy.transform.position - transform.position);
-            Debug.Log(vecTo.normalized);
-//            Debug.Log(totalReward.ToString("0.##########"));
-            Monitor.Log("Reward", totalReward, transform);
+            if (collectReward) {
+                if (_academy.trainingTackle) TackleReward();
+                else NormalReward();
+            }
 
-            AddReward(totalReward);
+
+//            Vector3 vecTo = (enemy.transform.position - transform.position);
+//            Debug.Log("Reward: " + GetReward() );
+////            Debug.Log("Cumulative: " + GetCumulativeReward() );
+////            Debug.Log(totalReward.ToString("0.##########"));
+//            Monitor.Log("Reward", GetCumulativeReward(), transform);
         }
 
-        private float NormalReward() {
+        private void NormalReward() {
             float totalReward = 0;
-            float distance = Vector3.Distance(enemy.transform.position, _tank.transform.position);
-            totalReward += -Mathf.Log((distance + .1f) / 10) / 10000;
+
 //            if (_tank.state == TankState.NORMAL) totalReward += -0.001f;
             if (_tank.state == TankState.BLOCK) totalReward += 0.001f * _tank.specialCounter;
             if (_tank.state == TankState.BOOST) totalReward += 0.001f * _tank.specialCounter;
@@ -103,33 +107,45 @@ namespace Tank.AI {
                 _tank.lastCollisionImpulse = Vector3.zero;
             }
 
-            if (enemy.state == TankState.DEAD) totalReward += 1;
-            if (_tank.state == TankState.DEAD) totalReward -= 2;
-            return totalReward;
-        }
-
-        private float TackleReward() {
-            float totalReward = 0;
-
-//            totalReward -= .0005f;
-//            float distance = Vector3.Distance(enemy.transform.position, _tank.transform.position);
-
-//            totalReward += -Mathf.Log((distance + .1f) / 10) / 10000;
-
-//            if (_tank.onEdge) totalReward += -0.035f;
-//            if (_tank.state == TankState.BOOST) totalReward += 0.001f * _tank.specialCounter;
-            if (_tank.state == TankState.DEAD) totalReward -= 1;
-            if (_tank.lastCollisionImpulse != Vector3.zero) {
+            if (enemy.state == TankState.DEAD) {
                 totalReward += 1;
-                _tank.lastCollisionImpulse = Vector3.zero;
-                StartCoroutine(WaitBeforeReset());
+                collectReward = false;
             }
 
-            return totalReward;
+            if (_tank.state == TankState.DEAD) {
+                totalReward -= 2;
+                collectReward = false;
+            }
+
+            AddReward(totalReward);
         }
 
-        private IEnumerator WaitBeforeReset() {
-            yield return new WaitForSeconds(.5f);
+        private void TackleReward() {
+            float distance = Vector3.Distance(enemy.transform.position, _tank.transform.position);
+            AddReward(-5f / 10000000f);
+            float deltaDis = lastDistance - distance;
+            if (Mathf.Abs(deltaDis) > 1f) {
+                lastDistance = Vector3.Distance(enemy.transform.position, _tank.transform.position);
+
+                AddReward(deltaDis / 1000000);
+            }
+
+            if (_tank.state == TankState.DEAD) {
+                AddReward(-1);
+                StartCoroutine(WaitBeforeReset(.5f));
+                collectReward = false;
+            }
+
+            if (_tank.lastCollisionImpulse != Vector3.zero) {
+                _tank.lastCollisionImpulse = Vector3.zero;
+                StartCoroutine(WaitBeforeReset(.5f));
+                AddReward(1);
+                collectReward = false;
+            }
+        }
+
+        private IEnumerator WaitBeforeReset(float time) {
+            yield return new WaitForSeconds(time);
             Done();
             if (enemyAgent) {
                 enemyAgent.Done();
@@ -138,12 +154,29 @@ namespace Tank.AI {
 
         public override void AgentReset() {
             gs.Reset();
+            collectReward = true;
+
+            if (_academy.spawnInMiddle) {
+                Vector3 middle = gs.getMiddlePosition();
+                float height = enemy.transform.position.y;
+                middle.y = height;
+                enemy.transform.position = middle;
+
+                _tank.transform.position = middle;
+
+
+                middle.z += 3;
+                middle.x += 2;
+                enemy.transform.position = middle;
+            }
 
             if (_academy.trainingTackle) {
                 Vector3 rand = UnityEngine.Random.onUnitSphere * _academy.enemySpawnVariance;
                 rand.y = 0;
                 enemy.transform.position += rand;
             }
+
+            lastDistance = Vector3.Distance(enemy.transform.position, _tank.transform.position);
         }
     }
 }

@@ -159,7 +159,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 9
   m_Type: 1
-  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
@@ -216,13 +216,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 978747619}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalRotation: {x: 0.46168363, y: -0.22734046, z: 0.12370775, w: 0.84844625}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 57.106003, y: -30.000002, z: 0}
 --- !u!1001 &1016806248
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -290,6 +290,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 956303407, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
       propertyPath: gs
       value: 
@@ -297,8 +307,12 @@ PrefabInstance:
     - target: {fileID: 956303407, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
       propertyPath: brain
       value: 
-      objectReference: {fileID: 11400000, guid: 93de719ecb70dd6488129510e1071b4d,
+      objectReference: {fileID: 11400000, guid: c5e7319704b40b545af559a0e0d7a0e3,
         type: 2}
+    - target: {fileID: 956303407, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: agentParameters.maxStep
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2035671393, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
       propertyPath: playerControl
       value: 0
@@ -338,13 +352,14 @@ MonoBehaviour:
     broadcastingBrains:
     - {fileID: 11400000, guid: 93de719ecb70dd6488129510e1071b4d, type: 2}
     - {fileID: 11400000, guid: c5e7319704b40b545af559a0e0d7a0e3, type: 2}
-    _brainsToControl: []
-  maxSteps: 5000
+    _brainsToControl:
+    - {fileID: 11400000, guid: c5e7319704b40b545af559a0e0d7a0e3, type: 2}
+  maxSteps: 0
   trainingConfiguration:
     width: 80
     height: 80
     qualityLevel: 1
-    timeScale: 50
+    timeScale: 100
     targetFrameRate: -1
   inferenceConfiguration:
     width: 1280
@@ -357,7 +372,8 @@ MonoBehaviour:
     - key: EnemySpawnVariance
       value: 10
   enemySpawnVariance: 10
-  trainingTackle: 1
+  trainingTackle: 0
+  spawnInMiddle: 0
 --- !u!4 &1169435223
 Transform:
   m_ObjectHideFlags: 0
@@ -514,6 +530,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 956303407, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
       propertyPath: gs
       value: 
@@ -524,8 +550,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 956303407, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
       propertyPath: agentParameters.maxStep
-      value: 10000
+      value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 956303407, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: brain
+      value: 
+      objectReference: {fileID: 11400000, guid: c5e7319704b40b545af559a0e0d7a0e3,
+        type: 2}
     - target: {fileID: 963194225, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -537,6 +568,10 @@ PrefabInstance:
     - target: {fileID: 2035671393, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
       propertyPath: playerControl
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1068371885, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 38771111e37af2d488a189e37cbabe33, type: 3}

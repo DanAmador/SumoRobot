@@ -12,6 +12,11 @@ namespace GameSession {
             platform = GetComponentInChildren<PlatformMover>();
         }
 
+
+        public Vector3 getMiddlePosition() {
+            return platform.transform.position;
+        }
+
         public TankController getEnemy(TankController player) {
             if (tanks == null)
                 tanks =

@@ -53,16 +53,19 @@ namespace Tank {
 
 
         public void Reset() {
+            lastCollisionImpulse = Vector3.zero;
+            _rb.velocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
+
             transform.position = initialPos;
             transform.rotation = initialRot;
             state = TankState.NORMAL;
             currSpeed = START_SPEED;
             specialCounter = 0;
-            lastCollisionImpulse = Vector3.zero;
-            _rb.velocity = Vector3.zero;
-            _rb.angularVelocity = Vector3.zero;
-            _rb.position = initialPos;
-            _rb.rotation = initialRot;
+
+//            _rb.position = initialPos;
+//            _rb.rotation = initialRot;
+            _rb.constraints = RigidbodyConstraints.None;
         }
 
         private void Update() {

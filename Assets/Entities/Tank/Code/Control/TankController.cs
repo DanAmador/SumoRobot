@@ -34,6 +34,10 @@ namespace Tank {
             return (currSpeed - START_SPEED) / (MAX_SPEED - START_SPEED);
         }
 
+        public float getNormalizedSpecial() {
+            return specialCounter / MAX_SPECIAL;
+        }
+
         #endregion
 
         #endregion
@@ -75,7 +79,7 @@ namespace Tank {
                     MAX_SPEED);
 
                 if (_input.Turbo) {
-                    if (specialCounter > 2) {
+                    if (specialCounter > 3) {
                         StartCoroutine(TurboBoost(specialCounter));
                     }
                 }
@@ -123,10 +127,6 @@ namespace Tank {
 
                 currSpeed = START_SPEED;
             }
-
-            if (collision.gameObject.CompareTag("Death")) {
-                state = TankState.DEAD;
-            }
         }
 
         private void OnCollisionExit(Collision collision) {
@@ -143,6 +143,11 @@ namespace Tank {
         private void OnTriggerEnter(Collider other) {
             if (other.gameObject.CompareTag("Edge")) {
                 onEdge = true;
+            }
+
+
+            if (other.gameObject.CompareTag("Death")) {
+                state = TankState.DEAD;
             }
         }
 

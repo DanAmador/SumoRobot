@@ -367,7 +367,7 @@ Transform:
   m_GameObject: {fileID: 7202223383700237942}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -2.3034022, y: 1.6608944, z: -2.4312792}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 1, z: 2}
   m_Children:
   - {fileID: 7202223383102763774}
   - {fileID: 46969057}
@@ -403,11 +403,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35a1ea7dae114eb49853d7874a115bcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationRate: 49.56
+  rotationRate: 50
   turnRotationAngle: 15
   turnRotationSeekSpeed: 0.2
   state: 0
   onEdge: 0
+  reflectedFlag: 0
   lastCollisionImpulse: {x: 0, y: 0, z: 0}
   _input: {fileID: 0}
 --- !u!114 &2035671393
@@ -422,7 +423,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64b2554ce16b09c45b75f83267c704ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerControl: 1
+  playerControl: 0
 --- !u!114 &1068371885
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -442,6 +443,7 @@ MonoBehaviour:
   - {fileID: 1128865589}
   - {fileID: 186549536}
   - {fileID: 1042684519}
+  working: 1
 --- !u!114 &956303407
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -458,7 +460,7 @@ MonoBehaviour:
   agentParameters:
     agentCameras: []
     agentRenderTextures: []
-    maxStep: 10000
+    maxStep: 0
     resetOnDone: 1
     onDemandDecision: 0
     numberOfActionsBetweenDecisions: 1

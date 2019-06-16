@@ -1,7 +1,7 @@
 default:
   trainer: ppo
   batch_size: 1024
-  beta: 5.0e-3
+  beta: 1e-4
   buffer_size: 10240
   epsilon: 0.2
   gamma: 0.99
@@ -17,6 +17,6 @@ default:
   use_curiosity: false
   curiosity_strength: 0.01
   curiosity_enc_size: 128
-  use_recurrent: false
-  memory_size: 256
-  sequence_length: 64
+  use_recurrent: true
+  memory_size: 128
+  sequence_length: 16

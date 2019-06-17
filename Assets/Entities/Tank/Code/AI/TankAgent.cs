@@ -15,6 +15,10 @@ namespace Tank.AI {
         private bool collectReward;
         private float lastDistance;
 
+        private float rayDistance = 50;
+        private float[] rayAngles = {0f, 45f, 70f, 90f, 135f, 180f, 110f, 270};
+        private String[] observables = {"Edge", "Player"};
+
         public override void InitializeAgent() {
             base.InitializeAgent();
             _tank = GetComponent<TankController>();
@@ -37,9 +41,7 @@ namespace Tank.AI {
             Transform tankTransform = _tank.transform;
             Vector3 normalized = tankTransform.rotation.eulerAngles / 360.0f; // [0,1]
 
-            float rayDistance = 50;
-            float[] rayAngles = {0f, 45f, 70f, 90f, 135f, 180f, 110f, 270};
-            String[] observables = {"Edge", "Player"};
+
             AddVectorObs(_rayPerception.Perceive(rayDistance, rayAngles, observables, 0f, 0f));
             AddVectorObs(_rayPerception.Perceive(rayDistance / 2, rayAngles, observables, 0f, 0f));
 
@@ -49,11 +51,13 @@ namespace Tank.AI {
             AddVectorObs(_tank.getNormalizedSpecial());
             AddVectorObs(_tank.getNormalizedSpeed());
             AddVectorObs(_tank.onEdge);
+            AddVectorObs(_tank.transform.forward);
 
             Transform enemyTransform = enemy.transform;
             Vector3 enemyPos = enemyTransform.position;
 
             AddVectorObs(1 - Vector3.Distance(enemyPos, tankTransform.position) / 60);
+            AddVectorObs(enemy.transform.forward);
             Vector3 vecTo = (enemyPos - transform.position);
             AddVectorObs(vecTo.normalized);
             AddVectorObs((int) enemy.state, Enum.GetValues(typeof(TankState)).Length);
@@ -96,7 +100,7 @@ namespace Tank.AI {
 //            Debug.Log("Reward: " + GetReward() );
 ////            Debug.Log("Cumulative: " + GetCumulativeReward() );
 ////            Debug.Log(totalReward.ToString("0.##########"));
-//            Monitor.Log("Reward", GetCumulativeReward(), transform);
+            Monitor.Log("Reward", GetCumulativeReward(), transform);
         }
 
         private void NormalReward() {
@@ -116,11 +120,10 @@ namespace Tank.AI {
                 //Facing forward
                 float forwardTackle = Vector3.Dot(_tank.transform.forward.normalized,
                     (enemy.transform.position - transform.position).normalized);
+                float angleBetweenFront = Vector3.Angle(_tank.transform.forward, -_tank.transform.forward);
+                float flankModifier = angleBetweenFront > 30 ? 0.5f : 1;
 
-                float attackingSide =
-                    1 - Vector3.Dot(_tank.transform.forward.normalized, enemy.transform.forward.normalized);
-
-                float mod = forwardTackle * .3f + attackingSide * .7f;
+                float mod = forwardTackle * flankModifier;
 
 
                 totalReward += Math.Abs(_tank.lastCollisionImpulse.normalized.magnitude) * mod;

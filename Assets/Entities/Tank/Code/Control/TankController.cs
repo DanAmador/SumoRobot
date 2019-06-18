@@ -67,16 +67,16 @@ namespace Tank {
             currSpeed = START_SPEED;
             specialCounter = 0;
 
-//            _rb.position = initialPos;
-//            _rb.rotation = initialRot;
             _rb.constraints = RigidbodyConstraints.None;
         }
 
         private void Update() {
             specialCounter = Mathf.Clamp(specialCounter + Time.deltaTime, 0, MAX_SPECIAL);
             if (state == TankState.NORMAL) {
-                currSpeed = Mathf.Clamp(currSpeed + Mathf.Abs(_input.ForwardInput) * currSpeed * Time.deltaTime, 1,
+                currSpeed = Mathf.Clamp(currSpeed + Mathf.Abs(_input.ForwardInput) * currSpeed * Time.deltaTime,
+                    START_SPEED,
                     MAX_SPEED);
+
 
                 if (_input.Turbo) {
                     if (specialCounter > 3) {
@@ -88,6 +88,12 @@ namespace Tank {
                     if (specialCounter > 3) {
                         StartCoroutine(BlockRoutine());
                     }
+                }
+
+
+                if (Mathf.Abs(_input.ForwardInput) != 1) {
+                    currSpeed = Mathf.Clamp(currSpeed - currSpeed * Time.deltaTime, START_SPEED,
+                        MAX_SPEED);
                 }
             }
         }

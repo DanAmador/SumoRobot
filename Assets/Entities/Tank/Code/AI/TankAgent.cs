@@ -107,7 +107,11 @@ namespace Tank.AI {
             float totalReward = 0;
 
 
-            totalReward += -5f * .0000001f;
+            totalReward += -.0000005f;
+
+            if (_tank.getNormalizedSpeed() <= .3f) {
+                totalReward += -.0002f;
+            }
 
             if (_tank.state == TankState.COLLIDED) totalReward += -0.0001f;
 
@@ -120,7 +124,8 @@ namespace Tank.AI {
                 //Facing forward
                 float forwardTackle = Vector3.Dot(_tank.transform.forward.normalized,
                     (enemy.transform.position - transform.position).normalized);
-                float side = Mathf.Abs(Vector3.Dot(_tank.transform.forward.normalized, enemy.transform.right));
+                float side =
+                    Mathf.Abs(Vector3.Dot(_tank.transform.forward.normalized, enemy.transform.right.normalized));
 
                 side = side >= .5f ? side : .5f;
 

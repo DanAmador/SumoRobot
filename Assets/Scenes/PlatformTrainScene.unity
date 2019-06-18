@@ -561,6 +561,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Tank (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7202223383700237942, guid: 38771111e37af2d488a189e37cbabe33,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -794,6 +799,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Tank
+      objectReference: {fileID: 0}
+    - target: {fileID: 7202223383700237942, guid: 38771111e37af2d488a189e37cbabe33,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
@@ -1217,6 +1227,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Platform
+      objectReference: {fileID: 0}
+    - target: {fileID: 8123455157296611816, guid: 64c4aa7ceaddc59448b07d62d8a05953,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8123455157296611820, guid: 64c4aa7ceaddc59448b07d62d8a05953,
         type: 3}
@@ -3436,6 +3451,10 @@ PrefabInstance:
       propertyPath: gs
       value: 
       objectReference: {fileID: 1801404476}
+    - target: {fileID: 956303407, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
 --- !u!4 &1025603806 stripped
@@ -4124,7 +4143,7 @@ MonoBehaviour:
     _brainsToControl:
     - {fileID: 11400000, guid: da74d0ec304ab764abbe2274e6029857, type: 2}
     - {fileID: 11400000, guid: c5e7319704b40b545af559a0e0d7a0e3, type: 2}
-  maxSteps: 30000
+  maxSteps: 10000
   trainingConfiguration:
     width: 80
     height: 80

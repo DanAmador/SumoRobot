@@ -1,0 +1,41 @@
+{
+  "measure": "reward",
+  "thresholds": [
+    1,
+    1,
+    1,
+    1.5
+  ],
+  "min_lesson_length": 100,
+  "signal_smoothing": false,
+  "parameters": {
+    "EnemySpawnVariance": [
+      5.0,
+      10.0,
+      15.0,
+      20.0,
+      0
+    ],
+    "TrainingTackle": [
+      1,
+      1,
+      1,
+      1,
+      0
+    ],
+    "SpawnInMiddle": [
+      1,
+      1,
+      1,
+      1,
+      0
+    ],
+    "PVP": [
+      0,
+      0,
+      0,
+      0,
+      1
+    ]
+  }
+}

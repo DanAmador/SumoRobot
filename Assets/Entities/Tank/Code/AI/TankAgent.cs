@@ -116,14 +116,15 @@ namespace Tank.AI {
                 _tank.reflectedFlag = false;
             }
 
-            if (_tank.lastCollisionImpulse != Vector3.zero) {
+            if (_tank.lastCollisionImpulse != Vector3.zero && _tank.getNormalizedSpeed() >= .7f) {
                 //Facing forward
                 float forwardTackle = Vector3.Dot(_tank.transform.forward.normalized,
                     (enemy.transform.position - transform.position).normalized);
-                float angleBetweenFront = Vector3.Angle(_tank.transform.forward, -_tank.transform.forward);
-                float flankModifier = angleBetweenFront > 30 ? 0.5f : 1;
+                float side = Mathf.Abs(Vector3.Dot(_tank.transform.forward.normalized, enemy.transform.right));
 
-                float mod = forwardTackle * flankModifier;
+                side = side >= .5f ? side : .5f;
+
+                float mod = forwardTackle * side;
 
 
                 totalReward += Math.Abs(_tank.lastCollisionImpulse.normalized.magnitude) * mod;

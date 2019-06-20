@@ -100,7 +100,7 @@ namespace Tank.AI {
 //            Debug.Log("Reward: " + GetReward() );
 ////            Debug.Log("Cumulative: " + GetCumulativeReward() );
 ////            Debug.Log(totalReward.ToString("0.##########"));
-            Monitor.Log("Reward", GetCumulativeReward(), transform);
+//            Monitor.Log("Reward", GetCumulativeReward(), transform);
         }
 
         private void NormalReward() {
@@ -110,15 +110,11 @@ namespace Tank.AI {
             totalReward += -.0000005f;
 
             if (_tank.getNormalizedSpeed() <= .3f) {
-                totalReward += -.0002f;
+                totalReward -= .0002f;
             }
 
-            if (_tank.state == TankState.COLLIDED) totalReward += -0.0001f;
+            if (_tank.state == TankState.COLLIDED) totalReward += -0.001f;
 
-            if (_tank.reflectedFlag) {
-                AddReward(0.1f);
-                _tank.reflectedFlag = false;
-            }
 
             if (_tank.lastCollisionImpulse != Vector3.zero && _tank.getNormalizedSpeed() >= .7f) {
                 //Facing forward

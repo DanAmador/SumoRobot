@@ -85,6 +85,8 @@ namespace Tank.AI {
             if (button == 3) _input.virtualInputSimulate(Buttons.DRIFT);
 
             if (collectReward) {
+                if (Vector3.Distance(_tank.transform.position, enemy.transform.position) > 9)
+                    _tank.tooCloseFlag = false;
                 if (_academy.trainingTackle) TackleReward();
                 else {
                     if (button != 0) {
@@ -100,24 +102,27 @@ namespace Tank.AI {
 //            Debug.Log("Reward: " + GetReward() );
 ////            Debug.Log("Cumulative: " + GetCumulativeReward() );
 ////            Debug.Log(totalReward.ToString("0.##########"));
-//            Monitor.Log("Reward", GetCumulativeReward(), transform);
+            Monitor.Log("Reward", GetCumulativeReward(), transform);
         }
 
         private void NormalReward() {
             float totalReward = 0;
 
 
-            totalReward += -.0000005f;
+            totalReward -= .0000005f;
 
             if (_tank.getNormalizedSpeed() <= .3f) {
                 totalReward -= .0002f;
             }
 
-            if (_tank.state == TankState.COLLIDED) totalReward += -0.001f;
+            if (_tank.state == TankState.COLLIDED) totalReward -= 0.001f;
+            if (_tank.tooCloseFlag) {
+                totalReward -= .0001f;
+            }
 
-
-            if (_tank.lastCollisionImpulse != Vector3.zero && _tank.getNormalizedSpeed() >= .7f) {
+            if (_tank.lastCollisionImpulse != Vector3.zero && !_tank.tooCloseFlag) {
                 //Facing forward
+
                 float forwardTackle = Vector3.Dot(_tank.transform.forward.normalized,
                     (enemy.transform.position - transform.position).normalized);
                 float side =
@@ -128,7 +133,8 @@ namespace Tank.AI {
                 float mod = forwardTackle * side;
 
 
-                totalReward += Math.Abs(_tank.lastCollisionImpulse.normalized.magnitude) * mod;
+                totalReward += Math.Abs(_tank.lastCollisionImpulse.normalized.magnitude) * mod *
+                               _tank._input.ForwardInput;
                 _tank.lastCollisionImpulse = Vector3.zero;
             }
 

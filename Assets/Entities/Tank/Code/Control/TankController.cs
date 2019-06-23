@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 
 namespace Tank {
@@ -15,9 +16,8 @@ namespace Tank {
         [Range(500, 1000)] private const float MAX_SPEED = 1000;
         [Range(150, 500)] private const float START_SPEED = 200;
         private float _rotationVelocity, _groundAngleVelocity;
-        public bool onEdge;
-
-        public Vector3 lastCollisionImpulse;
+        public bool onEdge, tooCloseFlag;
+        [NonSerialized] public Vector3 lastCollisionImpulse, lastCollisionPos;
         public TankInputs _input;
         public float currSpeed { get; private set; }
         public float specialCounter { get; private set; }
@@ -58,6 +58,7 @@ namespace Tank {
 
         public void Reset() {
             lastCollisionImpulse = Vector3.zero;
+            lastCollisionPos = initialPos;
             _rb.velocity = Vector3.zero;
             _rb.angularVelocity = Vector3.zero;
 
@@ -71,7 +72,9 @@ namespace Tank {
         }
 
         private void Update() {
+            Debug.DrawLine(lastCollisionPos, lastCollisionPos + transform.up * 10);
             specialCounter = Mathf.Clamp(specialCounter + Time.deltaTime, 0, MAX_SPECIAL);
+
             if (state == TankState.NORMAL) {
                 currSpeed = Mathf.Clamp(currSpeed + Mathf.Abs(_input.ForwardInput) * currSpeed * Time.deltaTime,
                     START_SPEED, MAX_SPEED);
@@ -118,18 +121,27 @@ namespace Tank {
             }
 
             if (collision.gameObject.CompareTag("Player")) {
-                TankController collider = collision.gameObject.GetComponent<TankController>();
-                if (collider.state == TankState.BLOCK) {
-                    state = TankState.COLLIDED;
-                    collision.rigidbody.constraints = RigidbodyConstraints.FreezeAll;
-                    _rb.AddForce((-collision.impulse / Time.deltaTime) * 2);
+                if (Vector3.Distance(lastCollisionPos, collision.transform.position) > 9 &&
+                    getNormalizedSpeed() > .9f) {
+                    tooCloseFlag = false;
+
+                    lastCollisionPos = collision.transform.position;
+                    TankController collider = collision.gameObject.GetComponent<TankController>();
+                    if (collider.state == TankState.BLOCK) {
+                        state = TankState.COLLIDED;
+                        collision.rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+                        _rb.AddForce(-2 * collision.impulse / Time.deltaTime);
+                    }
+                    else {
+                        lastCollisionImpulse = collision.impulse;
+                        collider.state = TankState.COLLIDED;
+                    }
+
+                    currSpeed = START_SPEED;
                 }
                 else {
-                    lastCollisionImpulse = collision.impulse;
-                    collider.state = TankState.COLLIDED;
+                    tooCloseFlag = true;
                 }
-
-                currSpeed = START_SPEED;
             }
         }
 

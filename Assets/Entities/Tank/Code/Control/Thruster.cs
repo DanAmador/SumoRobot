@@ -1,36 +1,27 @@
 ﻿using UnityEngine;
 
-namespace Tank {
-    public class Thruster : MonoBehaviour {
-        public float strength, distance;
+public class Thruster : MonoBehaviour {
+	[SerializeField] Rigidbody rb;
+	public float strength, distance;
+	
+	public void Thrust() {
+		RaycastHit hit;
+		float distancePercentage;
+		Vector3 downwardForce;
+		Debug.DrawRay(transform.position, transform.up * -1, Color.yellow);
+		
+		if (!Physics.Raycast(transform.position, transform.up * -1, out hit, distance)) return;
+		
+		distancePercentage = 1 - (hit.distance / distance);
+		downwardForce = strength * distancePercentage * transform.up;
+		downwardForce = Time.deltaTime * rb.mass * downwardForce;
+		rb.AddForceAtPosition(downwardForce, transform.position);
+	}
 
-        public Transform[] thrusters;
-        private Rigidbody rb;
-        public bool working = true;
-
-        public void Start() {
-            rb = GetComponent<Rigidbody>();
-        }
-
-        public void ToggleThrust() {
-            working = !working;
-        }
-
-        void FixedUpdate() {
-            if (working) {
-                foreach (Transform thruster in thrusters) {
-                    RaycastHit hit;
-                    float distancePercentage;
-                    Vector3 downwardForce;
-                    Debug.DrawRay(thruster.position, transform.up * -1, Color.yellow);
-                    if (Physics.Raycast(thruster.position, transform.up * -1, out hit, distance)) {
-                        distancePercentage = 1 - (hit.distance / distance);
-                        downwardForce = strength * distancePercentage * transform.up;
-                        downwardForce = Time.deltaTime * rb.mass * downwardForce;
-                        rb.AddForceAtPosition(downwardForce, thruster.position);
-                    }
-                }
-            }
-        }
-    }
+	public void InitValues(float strength, float distance,Rigidbody rb1) {
+		if (rb) return;
+		this.distance = distance;
+		this.strength = strength;
+		rb = rb1;
+	}
 }

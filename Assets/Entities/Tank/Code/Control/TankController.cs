@@ -13,10 +13,10 @@ namespace Tank {
 		public TankState state;
 
 		[Header("Player Parameters")] 
-		[Range(3, 10), SerializeField] private float MAX_SPECIAL;
-		[Range(800, 3000), SerializeField] private float MAX_SPEED;
-		[Range(150, 500), SerializeField] private  float START_SPEED;
-		[Range(1, 5), SerializeField] private float timeToStartMax;
+		[Range(3, 10), SerializeField] private float MAX_SPECIAL = 5 ;
+		[Range(800, 3000), SerializeField] private float MAX_SPEED = 2000;
+		[Range(150, 500), SerializeField] private  float START_SPEED = 300;
+		[Range(1, 5), SerializeField] private float timeToStartMax = 2.5f;
 
 		private float _rotationVelocity, _groundAngleVelocity, _accelRatePerSec;
 		public bool onEdge, tooCloseFlag;

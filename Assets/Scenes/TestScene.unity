@@ -165,6 +165,10 @@ MonoBehaviour:
   turnRotationAngle: 0
   turnRotationSeekSpeed: 0
   state: 2
+  MAX_SPECIAL: 5
+  MAX_SPEED: 1000
+  START_SPEED: 200
+  timeToStartMax: 2.5
   onEdge: 0
   tooCloseFlag: 0
   _input: {fileID: 0}

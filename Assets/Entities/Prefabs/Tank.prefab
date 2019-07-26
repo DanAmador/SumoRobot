@@ -403,13 +403,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35a1ea7dae114eb49853d7874a115bcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationRate: 50
-  turnRotationAngle: 15
-  turnRotationSeekSpeed: 0.2
+  rotationRate: 400
+  turnRotationAngle: 25
+  turnRotationSeekSpeed: 10
   state: 0
   onEdge: 0
-  reflectedFlag: 0
-  lastCollisionImpulse: {x: 0, y: 0, z: 0}
+  tooCloseFlag: 0
   _input: {fileID: 0}
 --- !u!114 &2035671393
 MonoBehaviour:

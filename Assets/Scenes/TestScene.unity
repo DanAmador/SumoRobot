@@ -161,11 +161,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35a1ea7dae114eb49853d7874a115bcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnSpeed: 5
   rotationRate: 0
   turnRotationAngle: 0
   turnRotationSeekSpeed: 0
   state: 2
+  onEdge: 0
+  tooCloseFlag: 0
   _input: {fileID: 0}
 --- !u!114 &581615304
 MonoBehaviour:
@@ -182,6 +183,7 @@ MonoBehaviour:
   strength: 0
   distance: 0
   thrusters: []
+  working: 1
 --- !u!114 &581615305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -194,7 +196,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64b2554ce16b09c45b75f83267c704ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player_control: 1
+  playerControl: 1
 --- !u!54 &581615306
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -508,25 +510,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b5dd737cc647b343b23338b360d14a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  broadcastHub:
-    broadcastingBrains:
-    - {fileID: 11400000, guid: 73f8f23c8a4b44a2915078bed1e2d801, type: 2}
-    _brainsToControl: []
-  maxSteps: 0
-  trainingConfiguration:
-    width: 80
-    height: 80
-    qualityLevel: 1
-    timeScale: 100
-    targetFrameRate: -1
-  inferenceConfiguration:
-    width: 1280
-    height: 720
-    qualityLevel: 5
-    timeScale: 1
-    targetFrameRate: 60
-  resetParameters:
-    resetParameters: []
 --- !u!4 &1617943534
 Transform:
   m_ObjectHideFlags: 0
@@ -610,14 +593,5 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 956303407, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
-      propertyPath: gs
-      value: 
-      objectReference: {fileID: 1617943532}
-    - target: {fileID: 956303407, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
-      propertyPath: brain
-      value: 
-      objectReference: {fileID: 11400000, guid: 93de719ecb70dd6488129510e1071b4d,
-        type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 38771111e37af2d488a189e37cbabe33, type: 3}

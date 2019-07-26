@@ -48,8 +48,8 @@ namespace Tank.AI {
 
             AddVectorObs(normalized);
             AddVectorObs((int) _tank.state, Enum.GetValues(typeof(TankState)).Length);
-            AddVectorObs(_tank.getNormalizedSpecial());
-            AddVectorObs(_tank.getNormalizedSpeed());
+            AddVectorObs(_tank.GetNormalizedSpecial());
+            AddVectorObs(_tank.GetNormalizedSpeed());
             AddVectorObs(_tank.onEdge);
             AddVectorObs(_tank.transform.forward);
 
@@ -62,7 +62,7 @@ namespace Tank.AI {
             AddVectorObs(vecTo.normalized);
             AddVectorObs((int) enemy.state, Enum.GetValues(typeof(TankState)).Length);
             AddVectorObs(Vector3.Dot(_tank.transform.forward.normalized, vecTo.normalized));
-            AddVectorObs(enemy.getNormalizedSpecial());
+            AddVectorObs(enemy.GetNormalizedSpecial());
         }
 
         public override void AgentAction(float[] vectorAction, string textAction) {
@@ -85,8 +85,7 @@ namespace Tank.AI {
             if (button == 3) _input.virtualInputSimulate(Buttons.DRIFT);
 
             if (collectReward) {
-                if (Vector3.Distance(_tank.transform.position, enemy.transform.position) > 9)
-                    _tank.tooCloseFlag = false;
+                if (Vector3.Distance(_tank.transform.position, enemy.transform.position) > 9) _tank.tooCloseFlag = false;
                 if (_academy.trainingTackle) TackleReward();
                 else {
                     if (button != 0) {
@@ -111,7 +110,7 @@ namespace Tank.AI {
 
             totalReward -= .0000005f;
 
-            if (_tank.getNormalizedSpeed() <= .3f) {
+            if (_tank.GetNormalizedSpeed() <= .4f) {
                 totalReward -= .0002f;
             }
 
@@ -123,18 +122,12 @@ namespace Tank.AI {
             if (_tank.lastCollisionImpulse != Vector3.zero && !_tank.tooCloseFlag) {
                 //Facing forward
 
-                float forwardTackle = Vector3.Dot(_tank.transform.forward.normalized,
-                    (enemy.transform.position - transform.position).normalized);
-                float side =
-                    Mathf.Abs(Vector3.Dot(_tank.transform.forward.normalized, enemy.transform.right.normalized));
+                float forwardTackle = Vector3.Dot(_tank.transform.forward.normalized,(enemy.transform.position - transform.position).normalized);
+                float side = Mathf.Abs(Vector3.Dot(_tank.transform.forward.normalized, enemy.transform.right.normalized));
 
                 side = side >= .5f ? side : .5f;
-
-                float mod = forwardTackle * side;
-
-
-                totalReward += Math.Abs(_tank.lastCollisionImpulse.normalized.magnitude) * mod *
-                               _tank._input.ForwardInput;
+                
+                totalReward +=  forwardTackle * side * _tank._input.ForwardInput;
                 _tank.lastCollisionImpulse = Vector3.zero;
             }
 

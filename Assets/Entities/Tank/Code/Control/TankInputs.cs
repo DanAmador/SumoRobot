@@ -34,7 +34,7 @@ namespace Tank {
             set => block = value;
         }
 
-        public void virtualInputSimulate(Buttons button, float time = .5f) {
+        public void VirtualInputSimulate(Buttons button, float time = .5f) {
             StartCoroutine(HoldValue(time, button));
         }
 

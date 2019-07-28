@@ -80,9 +80,9 @@ namespace Tank.AI {
             if (rotation == 1) _input.RotationInput = 1;
             if (rotation == 2) _input.RotationInput = -1;
 
-            if (button == 1) _input.virtualInputSimulate(Buttons.BLOCK, time: 1f);
-            if (button == 2) _input.virtualInputSimulate(Buttons.TURBO, time: 1f);
-            if (button == 3) _input.virtualInputSimulate(Buttons.DRIFT);
+            if (button == 1) _input.VirtualInputSimulate(Buttons.BLOCK, time: 1f);
+            if (button == 2) _input.VirtualInputSimulate(Buttons.TURBO, time: 1f);
+            if (button == 3) _input.VirtualInputSimulate(Buttons.DRIFT);
 
             if (collectReward) {
                 if (Vector3.Distance(_tank.transform.position, enemy.transform.position) > 9) _tank.tooCloseFlag = false;

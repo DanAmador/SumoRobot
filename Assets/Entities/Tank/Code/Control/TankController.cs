@@ -3,11 +3,12 @@ using System.Collections;
 using UnityEngine;
 
 namespace Tank {
+	[RequireComponent(typeof(ThrusterManager))]
 	[RequireComponent(typeof(Rigidbody))]
 	[RequireComponent(typeof(TankInputs))]
 	public class TankController : MonoBehaviour {
 		#region Variables
-
+		
 		[Header("Movement Properties")] public float rotationRate, turnRotationAngle, turnRotationSeekSpeed;
 
 		public TankState state;
@@ -17,7 +18,7 @@ namespace Tank {
 		[Range(800, 3000), SerializeField] private float MAX_SPEED = 2000;
 		[Range(150, 500), SerializeField] private  float START_SPEED = 300;
 		[Range(1, 5), SerializeField] private float timeToStartMax = 2.5f;
-
+		
 		private float _rotationVelocity, _groundAngleVelocity, _accelRatePerSec;
 		public bool onEdge, tooCloseFlag;
 		[NonSerialized] public Vector3 lastCollisionImpulse, lastCollisionPos;
@@ -26,8 +27,7 @@ namespace Tank {
 		public float SpecialCounter { get; private set; }
 
 		private Rigidbody _rb;
-		private Thruster _thrusters;
-
+		private ThrusterManager _tm; 
 		private Vector3 _initialPos;
 		private Quaternion _initialRot;
 
@@ -51,8 +51,8 @@ namespace Tank {
 		void Start() {
 			_accelRatePerSec = (MAX_SPEED - START_SPEED) / timeToStartMax;
 			_rb = GetComponent<Rigidbody>();
+			_tm = GetComponent<ThrusterManager>();
 			_input = GetComponent<TankInputs>();
-			_thrusters = GetComponentInChildren<Thruster>();
 			CurrSpeed = START_SPEED;
 			state = TankState.NORMAL;
 			_initialPos = transform.position;
@@ -111,7 +111,7 @@ namespace Tank {
 				CurrSpeed = START_SPEED;
 			}
 
-			if (_rb && _input && _thrusters) {
+			if (_rb && _input && _tm) {
 				HandleMovement();
 			}
 		}
@@ -193,11 +193,11 @@ namespace Tank {
 		#region Game Logic 
 
 		protected virtual void HandleMovement() {
-			float drift_modifier = _input.Drift ? 0.5f : 1;
+			float driftModifier = _input.Drift ? 0.5f : 1;
 
-			if (Physics.Raycast(transform.position, transform.up * -1, _thrusters.distance)) {
-				_rb.drag = 1 * (1 / drift_modifier);
-				Vector3 forwardForce = CurrSpeed * _input.ForwardInput * drift_modifier * transform.forward;
+			if (Physics.Raycast(transform.position, transform.up * -1, _tm.distance)) {
+				_rb.drag = 1 * (1 / driftModifier);
+				Vector3 forwardForce = CurrSpeed * _input.ForwardInput * driftModifier * transform.forward;
 				forwardForce = Time.deltaTime * _rb.mass * forwardForce;
 				_rb.AddForce(forwardForce);
 			}
@@ -206,7 +206,7 @@ namespace Tank {
 			}
 
 
-			Vector3 turnTorque = rotationRate * _input.RotationInput * (1 / drift_modifier) * Vector3.up;
+			Vector3 turnTorque = rotationRate * _input.RotationInput * (1 / driftModifier) * Vector3.up;
 
 			turnTorque = Time.deltaTime * _rb.mass * turnTorque;
 			_rb.AddTorque(turnTorque);

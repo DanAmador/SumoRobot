@@ -9,7 +9,7 @@ namespace Tank {
 		public float strength, distance;
 		public ParticleSystem ps;
 		public void Awake() {
-			Rigidbody rb = GetComponent<Rigidbody>();
+			Rigidbody rb = GetComponentInParent<Rigidbody>();
 
 			thrusters = new List<Thruster>();
 			foreach (GameObject obj in thrusterTransforms) {

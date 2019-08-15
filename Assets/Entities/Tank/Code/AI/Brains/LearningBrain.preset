@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!181963792 &2655988077585873504
+Preset:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: LearningBrain
+  m_TargetType:
+    m_NativeTypeID: 114
+    m_ManagedTypePPtr: {fileID: 11500000, guid: 8b23992c8eb17439887f5e944bf04a40,
+      type: 3}
+    m_ManagedTypeFallback: 
+  m_Properties:
+  - target: {fileID: 0}
+    propertyPath: m_Enabled
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EditorHideFlags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EditorClassIdentifier
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: brainParameters.vectorObservationSize
+    value: 92
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: brainParameters.numStackedVectorObservations
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: brainParameters.vectorActionSize.Array.size
+    value: 3
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: brainParameters.vectorActionSize.Array.data[0]
+    value: 3
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: brainParameters.vectorActionSize.Array.data[1]
+    value: 3
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: brainParameters.vectorActionSize.Array.data[2]
+    value: 4
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: brainParameters.cameraResolutions.Array.size
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: brainParameters.vectorActionDescriptions.Array.size
+    value: 3
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: brainParameters.vectorActionDescriptions.Array.data[0]
+    value: Forward
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: brainParameters.vectorActionDescriptions.Array.data[1]
+    value: Rotation
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: brainParameters.vectorActionDescriptions.Array.data[2]
+    value: Buttons
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: brainParameters.vectorActionSpaceType
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: model
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: inferenceDevice
+    value: 0
+    objectReference: {fileID: 0}

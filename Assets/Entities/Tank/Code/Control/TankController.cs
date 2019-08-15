@@ -1,259 +1,271 @@
 ﻿using System;
 using System.Collections;
+using Tank.AI;
 using UnityEngine;
 
 namespace Tank {
-	[RequireComponent(typeof(ThrusterManager))]
-	[RequireComponent(typeof(Rigidbody))]
-	[RequireComponent(typeof(TankInputs))]
-	public class TankController : MonoBehaviour {
-		#region Variables
-		
-		[Header("Movement Properties")] public float rotationRate, turnRotationAngle, turnRotationSeekSpeed;
+    [RequireComponent(typeof(ThrusterManager))]
+    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(TankInputs))]
+    [RequireComponent(typeof(TankAgent))]
+    public class TankController : MonoBehaviour {
+        #region Variables
 
-		public TankState state;
+        [Header("Movement Properties")] public float rotationRate, turnRotationAngle, turnRotationSeekSpeed;
 
-		[Header("Player Parameters")] 
-		[Range(3, 10), SerializeField] private float MAX_SPECIAL = 5 ;
-		[Range(800, 3000), SerializeField] private float MAX_SPEED = 2000;
-		[Range(150, 500), SerializeField] private  float START_SPEED = 300;
-		[Range(1, 5), SerializeField] private float timeToStartMax = 2.5f;
-		
-		private float _rotationVelocity, _groundAngleVelocity, _accelRatePerSec;
-		public bool onEdge, tooCloseFlag;
-		[NonSerialized] public Vector3 lastCollisionImpulse, lastCollisionPos;
-		public TankInputs _input;
-		public float CurrSpeed { get; private set; }
-		public float SpecialCounter { get; private set; }
+        public TankState state;
 
-		private Rigidbody _rb;
-		private ThrusterManager _tm; 
-		private Vector3 _initialPos;
-		private Quaternion _initialRot;
+        [Header("Player Parameters")] [Range(3, 10), SerializeField]
+        private float MAX_SPECIAL = 5;
 
-		#region Getters
+        [Range(800, 3000), SerializeField] private float MAX_SPEED = 2000;
+        [Range(150, 500), SerializeField] private float START_SPEED = 300;
+        [Range(1, 5), SerializeField] private float timeToStartMax = 2.5f;
 
-		public float GetNormalizedSpeed() {
-			return (CurrSpeed - START_SPEED) / (MAX_SPEED - START_SPEED);
-		}
+        private float _rotationVelocity, _groundAngleVelocity, _accelRatePerSec;
+        public bool onEdge, tooCloseFlag;
+        [NonSerialized] public Vector3 lastCollisionPos;
+        public TankInputs _input;
+        public float CurrSpeed { get; private set; }
+        public float SpecialCounter { get; private set; }
 
-		public float GetNormalizedSpecial() {
-			return SpecialCounter / MAX_SPECIAL;
-		}
+        private Rigidbody _rb;
+        private ThrusterManager _tm;
+        private Vector3 _initialPos;
+        private Quaternion _initialRot;
+        [SerializeField] private TankAgent _agent;
 
-		#endregion
+        #region Getters
 
-		#endregion
+        public float GetNormalizedSpeed() {
+            return (CurrSpeed - START_SPEED) / (MAX_SPEED - START_SPEED);
+        }
 
+        public float GetNormalizedSpecial() {
+            return SpecialCounter / MAX_SPECIAL;
+        }
 
-		#region Mono Methods
+        #endregion
 
-		void Start() {
-			_accelRatePerSec = (MAX_SPEED - START_SPEED) / timeToStartMax;
-			_rb = GetComponent<Rigidbody>();
-			_tm = GetComponent<ThrusterManager>();
-			_input = GetComponent<TankInputs>();
-			CurrSpeed = START_SPEED;
-			state = TankState.NORMAL;
-			_initialPos = transform.position;
-			_initialRot = transform.rotation;
-		}
+        #endregion
 
 
-		public void Reset() {
-			lastCollisionImpulse = Vector3.zero;
-			lastCollisionPos = _initialPos;
-			_rb.velocity = Vector3.zero;
-			_rb.angularVelocity = Vector3.zero;
+        #region Mono Methods
 
-			transform.position = _initialPos;
-			transform.rotation = _initialRot;
-			state = TankState.NORMAL;
-			CurrSpeed = START_SPEED;
-			SpecialCounter = 0;
-
-			_rb.constraints = RigidbodyConstraints.None;
-		}
-
-		private void Update() {
-			Debug.DrawLine(lastCollisionPos, lastCollisionPos + transform.up * 10);
-			SpecialCounter = Mathf.Clamp(SpecialCounter + Time.deltaTime, 0, MAX_SPECIAL);
-
-			if (state == TankState.NORMAL) {
-				CurrSpeed = Mathf.Clamp(CurrSpeed + Mathf.Abs(_input.ForwardInput) * _accelRatePerSec * Time.deltaTime,
-					START_SPEED, MAX_SPEED);
+        void Start() {
+            _agent = GetComponent<TankAgent>();
+            _accelRatePerSec = (MAX_SPEED - START_SPEED) / timeToStartMax;
+            _rb = GetComponent<Rigidbody>();
+            _tm = GetComponent<ThrusterManager>();
+            _input = GetComponent<TankInputs>();
+            CurrSpeed = START_SPEED;
+            state = TankState.NORMAL;
+            _initialPos = transform.position;
+            _initialRot = transform.rotation;
+        }
 
 
-				if (_input.Turbo) {
-					if (SpecialCounter > 3) {
-						StartCoroutine(TurboBoost(SpecialCounter));
-					}
-				}
+        public void Reset() {
+            lastCollisionPos = _initialPos;
+            _rb.velocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
 
-				if (_input.Block) {
-					if (SpecialCounter > 3) {
-						StartCoroutine(BlockRoutine());
-					}
-				}
+            transform.position = _initialPos;
+            transform.rotation = _initialRot;
+            state = TankState.NORMAL;
+            CurrSpeed = START_SPEED;
+            SpecialCounter = 0;
 
+            _rb.constraints = RigidbodyConstraints.None;
+        }
 
-				if (Mathf.Abs(_input.ForwardInput) < .50f) {
-					CurrSpeed = Mathf.Clamp(CurrSpeed - (CurrSpeed * Time.deltaTime) * .5f , START_SPEED,
-						MAX_SPEED);
-				}
-			}
-		}
+        private void Update() {
+            Debug.DrawLine(lastCollisionPos, lastCollisionPos + transform.up * 10);
+            SpecialCounter = Mathf.Clamp(SpecialCounter + Time.deltaTime, 0, MAX_SPECIAL);
 
 
-		void FixedUpdate() {
-			if (state == TankState.COLLIDED) {
-				state = TankState.NORMAL;
-				CurrSpeed = START_SPEED;
-			}
+            if (tooCloseFlag) {
+                if (Vector3.Distance(lastCollisionPos, transform.position) > 9) {
+                    tooCloseFlag = false;
+                }
+            }
 
-			if (_rb && _input && _tm) {
-				HandleMovement();
-			}
-		}
-
-		#region Collider Events
-
-		void OnCollisionEnter(Collision collision) {
-			if (state == TankState.BLOCK) {
-				lastCollisionImpulse = collision.impulse;
-				return;
-			}
-
-			if (collision.gameObject.CompareTag("Player")) {
-				if (Vector3.Distance(lastCollisionPos, collision.transform.position) > 9 &&
-				    GetNormalizedSpeed() > .9f) {
-					tooCloseFlag = false;
-					lastCollisionPos = collision.transform.position;
-				}
-				else {
-					tooCloseFlag = true;
-				}
-
-				TankController collider = collision.gameObject.GetComponent<TankController>();
-				if (collider.state == TankState.BLOCK) {
-					state = TankState.COLLIDED;
-					collision.rigidbody.constraints = RigidbodyConstraints.FreezeAll;
-					_rb.AddForce(-2 * collision.impulse / Time.deltaTime);
-				}
-				else {
-					lastCollisionImpulse = collision.impulse;
-					collider.state = TankState.COLLIDED;
-				}
-
-				CurrSpeed = START_SPEED;
-			}
-		}
-
-		private void OnCollisionExit(Collision collision) {
-			if (state == TankState.BLOCK) return;
-			if (collision.gameObject.CompareTag("Player")) {
-				TankController collider = collision.gameObject.GetComponent<TankController>();
-				if (collider.state == TankState.BLOCK) {
-					collision.rigidbody.constraints = RigidbodyConstraints.None;
-				}
-			}
-		}
+            if (state == TankState.NORMAL) {
+                CurrSpeed = Mathf.Clamp(CurrSpeed + Mathf.Abs(_input.ForwardInput) * _accelRatePerSec * Time.deltaTime,
+                    START_SPEED, MAX_SPEED);
 
 
-		private void OnTriggerEnter(Collider other) {
-			if (other.gameObject.CompareTag("Edge")) {
-				onEdge = true;
-			}
+                if (_input.Turbo) {
+                    if (SpecialCounter > 3) {
+                        StartCoroutine(TurboBoost(SpecialCounter));
+                    }
+                }
+
+                if (_input.Block) {
+                    if (SpecialCounter > 3) {
+                        StartCoroutine(BlockRoutine());
+                    }
+                }
 
 
-			if (other.gameObject.CompareTag("Death")) {
-				state = TankState.DEAD;
-			}
-		}
-
-		private void OnTriggerStay(Collider other) {
-			if (other.gameObject.CompareTag("Edge")) {
-				onEdge = true;
-			}
-		}
-
-		private void OnTriggerExit(Collider other) {
-			if (other.gameObject.CompareTag("Edge")) {
-				onEdge = false;
-			}
-		}
-
-		#endregion
-
-		#endregion
+                if (Mathf.Abs(_input.ForwardInput) < .50f) {
+                    CurrSpeed = Mathf.Clamp(CurrSpeed - (CurrSpeed * Time.deltaTime) * .5f, START_SPEED,
+                        MAX_SPEED);
+                }
+            }
+        }
 
 
-		#region Custom Code
+        void FixedUpdate() {
+            if (state == TankState.COLLIDED) {
+                state = TankState.NORMAL;
+                CurrSpeed = START_SPEED;
+            }
 
-		#region Game Logic 
+            if (_rb && _input && _tm) {
+                HandleMovement();
+            }
+        }
 
-		protected virtual void HandleMovement() {
-			float driftModifier = _input.Drift ? 0.5f : 1;
+        #region Collider Events
 
-			if (Physics.Raycast(transform.position, transform.up * -1, _tm.distance)) {
-				_rb.drag = 1 * (1 / driftModifier);
-				Vector3 forwardForce = CurrSpeed * _input.ForwardInput * driftModifier * transform.forward;
-				forwardForce = Time.deltaTime * _rb.mass * forwardForce;
-				_rb.AddForce(forwardForce);
-			}
-			else {
-				_rb.drag = 0;
-			}
+        //I really should've used a State or Observer Design pattern ... this is a fucking mess, but it's too late now, sorry :( 
+        void OnCollisionEnter(Collision collision) {
+            if (collision.gameObject.CompareTag("Player") && !tooCloseFlag) {
+   
+                if (state == TankState.BLOCK) {
+                    _rb.constraints = RigidbodyConstraints.FreezeAll;
+
+                    _agent.AddReward(.5f);
+                    return;
+                }
 
 
-			Vector3 turnTorque = rotationRate * _input.RotationInput * (1 / driftModifier) * Vector3.up;
+                TankController collider = collision.gameObject.GetComponent<TankController>();
+                if (collider.state == TankState.BLOCK) {
+                    state = TankState.COLLIDED;
+                    _rb.AddForce(-2 * collision.impulse / Time.deltaTime);
+                }
+                else {
+                    collider.state = TankState.COLLIDED;
+                }
 
-			turnTorque = Time.deltaTime * _rb.mass * turnTorque;
-			_rb.AddTorque(turnTorque);
 
-			Vector3 newRotation = transform.eulerAngles;
-			newRotation.z = Mathf.SmoothDampAngle(newRotation.z, _input.RotationInput * -turnRotationAngle,
-				ref _rotationVelocity, turnRotationSeekSpeed);
-			transform.eulerAngles = newRotation;
-		}
+                _agent.TackleReward();
+                
+                if (Vector3.Distance(lastCollisionPos, collision.transform.position) < 9) {
+                    tooCloseFlag = true;
+                }
 
-		#endregion
+                lastCollisionPos = collider.transform.position;
+                CurrSpeed = START_SPEED;
+            }
+        }
 
-		#region ObservationHelper
+        private void OnCollisionExit(Collision collision) {
+            if (collision.gameObject.CompareTag("Player")) {
+                TankController collider = collision.gameObject.GetComponent<TankController>();
+                if (state == TankState.BLOCK) {
+                    _rb.constraints = RigidbodyConstraints.None;
+                }
+            }
+        }
 
-		#endregion
 
-		#region Routines
+        private void OnTriggerEnter(Collider other) {
+            if (other.gameObject.CompareTag("Edge")) {
+                onEdge = true;
+            }
 
-		private IEnumerator BlockRoutine() {
-			state = TankState.BLOCK;
 
-			yield return new WaitUntil(BlockPredicate);
+            if (other.gameObject.CompareTag("Death")) {
+                state = TankState.DEAD;
+            }
+        }
 
-			state = TankState.NORMAL;
-		}
+        private void OnTriggerStay(Collider other) {
+            if (other.gameObject.CompareTag("Edge")) {
+                onEdge = true;
+            }
+        }
 
-		private bool BlockPredicate() {
-			_rb.AddForce(-_rb.velocity);
-			_rb.velocity = Vector3.zero;
-			_rb.position = transform.position;
-			SpecialCounter -= Time.deltaTime * 5;
-			return !_input.Block || SpecialCounter <= 0;
-		}
+        private void OnTriggerExit(Collider other) {
+            if (other.gameObject.CompareTag("Edge")) {
+                onEdge = false;
+            }
+        }
 
-		private IEnumerator TurboBoost(float currentSpecial) {
-			float fraction = (currentSpecial * currentSpecial) / MAX_SPECIAL;
-			state = TankState.BOOST;
-			CurrSpeed += MAX_SPEED * fraction;
-			yield return new WaitForSeconds(1);
+        #endregion
 
-			state = TankState.NORMAL;
-			SpecialCounter = 0;
-			CurrSpeed = MAX_SPEED;
-		}
+        #endregion
 
-		#endregion
 
-		#endregion
-	}
+        #region Custom Code
+
+        #region Game Logic 
+
+        protected virtual void HandleMovement() {
+            float driftModifier = _input.Drift ? 0.5f : 1;
+
+            if (Physics.Raycast(transform.position, transform.up * -1, _tm.distance)) {
+                _rb.drag = 1 * (1 / driftModifier);
+                Vector3 forwardForce = CurrSpeed * _input.ForwardInput * driftModifier * transform.forward;
+                forwardForce = Time.deltaTime * _rb.mass * forwardForce;
+                _rb.AddForce(forwardForce);
+            }
+            else {
+                _rb.drag = 0;
+            }
+
+
+            Vector3 turnTorque = rotationRate * _input.RotationInput * (1 / driftModifier) * Vector3.up;
+
+            turnTorque = Time.deltaTime * _rb.mass * turnTorque;
+            _rb.AddTorque(turnTorque);
+
+            Vector3 newRotation = transform.eulerAngles;
+            newRotation.z = Mathf.SmoothDampAngle(newRotation.z, _input.RotationInput * -turnRotationAngle,
+                ref _rotationVelocity, turnRotationSeekSpeed);
+            transform.eulerAngles = newRotation;
+        }
+
+        #endregion
+
+        #region ObservationHelper
+
+        #endregion
+
+        #region Routines
+
+        private IEnumerator BlockRoutine() {
+            state = TankState.BLOCK;
+
+            yield return new WaitUntil(BlockPredicate);
+
+            state = TankState.NORMAL;
+        }
+
+        private bool BlockPredicate() {
+            _rb.AddForce(-_rb.velocity);
+            _rb.velocity = Vector3.zero;
+            _rb.position = transform.position;
+            SpecialCounter -= Time.deltaTime * 5;
+            return !_input.Block || SpecialCounter <= 0;
+        }
+
+        private IEnumerator TurboBoost(float currentSpecial) {
+            float fraction = (currentSpecial * currentSpecial) / MAX_SPECIAL;
+            state = TankState.BOOST;
+            CurrSpeed += MAX_SPEED * fraction;
+            yield return new WaitForSeconds(1);
+
+            state = TankState.NORMAL;
+            SpecialCounter = 0;
+            CurrSpeed = MAX_SPEED;
+        }
+
+        #endregion
+
+        #endregion
+    }
 }

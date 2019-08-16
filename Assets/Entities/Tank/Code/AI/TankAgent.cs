@@ -62,6 +62,7 @@ namespace Tank.AI {
             AddVectorObs((int) enemy.state, Enum.GetValues(typeof(TankState)).Length);
             AddVectorObs(Vector3.Dot(_tank.transform.forward.normalized, vecTo.normalized));
             AddVectorObs(enemy.GetNormalizedSpecial());
+            AddVectorObs(1 - Vector2.Distance(_tank.lastCollisionPos,_tank.transform.position )/9f);
         }
 
         public override void AgentAction(float[] vectorAction, string textAction) {
@@ -80,8 +81,8 @@ namespace Tank.AI {
             if (rotation == 1) _input.RotationInput = 1;
             if (rotation == 2) _input.RotationInput = -1;
 
-            if (button == 1) _input.VirtualInputSimulate(Buttons.BLOCK, time: 1f);
-            if (button == 2) _input.VirtualInputSimulate(Buttons.TURBO, time: 1f);
+            if (button == 1) _input.VirtualInputSimulate(Buttons.BLOCK, 1f);
+            if (button == 2) _input.VirtualInputSimulate(Buttons.TURBO, 1f);
             if (button == 3) _input.VirtualInputSimulate(Buttons.DRIFT);
 
 
@@ -129,9 +130,9 @@ namespace Tank.AI {
                     //Facing forward
                     var transform1 = _tank.transform;
                     float forwardTackle = Vector3.Dot(transform1.forward.normalized,
-                        (enemy.transform.position - transform1.position).normalized); // Is it facing the enemy ? 
-
-                    if (forwardTackle < 0.2f) return;
+                        (enemy.transform.position - transform1.position).normalized); // Is it facing the enemy ?
+                    
+                    if (forwardTackle < 0.5f) return;
 
 
                     float side =

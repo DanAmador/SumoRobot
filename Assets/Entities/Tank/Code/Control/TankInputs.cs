@@ -8,7 +8,7 @@ namespace Tank {
         private bool turbo, block, drift;
         private bool blockFlag, turboFlag, driftFlag;
         private int playerNum = 1;
-
+        public bool simulating = true;
         private void Update() {
             HandleInputs();
         }
@@ -35,7 +35,8 @@ namespace Tank {
         }
 
         public void VirtualInputSimulate(Buttons button, float time = .5f) {
-            StartCoroutine(HoldValue(time, button));
+            
+            if(simulating) StartCoroutine(HoldValue(time, button));
         }
 
         //Please don't judge this ugly ass piece of code, I've been working for 5 days straight and I don't know what I'm doing

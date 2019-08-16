@@ -13,7 +13,7 @@ namespace Tank.AI {
         private RayPerception3D _rayPerception;
         private bool collectReward;
 
-        private float rayDistance = 50;
+        private float rayDistance ;
         private float[] rayAngles = {0f, 45f, 70f, 90f, 135f, 180f, 110f, 270};
         private String[] observables = {"Edge", "Player"};
 
@@ -23,7 +23,7 @@ namespace Tank.AI {
             _input = GetComponent<TankInputs>();
 //            _input.playerControl = false;
 
-
+            rayDistance = _tank.tooCloseLimit * 7;
             enemy = gs.getEnemy(_tank);
             enemyAgent = enemy.GetComponent<TankAgent>();
 
@@ -95,19 +95,19 @@ namespace Tank.AI {
 ////            Debug.Log(totalReward.ToString("0.##########"));
 
 
-            Monitor.Log("Reward", GetCumulativeReward(), transform);
+            Monitor.Log("Reward", GetReward(), transform);
         }
 
         private void NormalReward() {
             float totalReward = 0;
-            totalReward -= .0005f;
+            totalReward -= .0000005f;
 
             if (_tank.GetNormalizedSpeed() <= .4f) {
-                totalReward -= .0002f;
+                totalReward -= .00002f;
             }
 
             if (_tank.tooCloseFlag) {
-                totalReward -= .001f;
+                totalReward -= .00001f;
             }
 
             if (_tank.onEdge) {
@@ -160,6 +160,18 @@ namespace Tank.AI {
         public override void AgentReset() {
             gs.Reset();
             collectReward = true;
+
+            StartCoroutine(ResetWait());
+        }
+        
+        
+        private IEnumerator ResetWait() {
+            //Wait 2 seconds in case the physics are glitchy
+            _input.simulating = false;
+            yield return new WaitForSeconds(2);
+
+            _input.simulating = true;
         }
     }
+    
 }

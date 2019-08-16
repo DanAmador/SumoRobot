@@ -153,8 +153,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   distanceUp: 4.09
-  distanceBack: -6.6
-  minimumHeight: 4.39
+  distanceBack: -11.31
+  minimumHeight: 8.06
 --- !u!1 &1042684518
 GameObject:
   m_ObjectHideFlags: 0

@@ -91,6 +91,8 @@ namespace Tank.AI {
 ////            Debug.Log("Cumulative: " + GetCumulativeReward() );
 ////            Debug.Log(totalReward.ToString("0.##########"));
 
+
+
             Monitor.Log("Reward", GetCumulativeReward(), transform);
         }
 
@@ -106,12 +108,13 @@ namespace Tank.AI {
                 totalReward -= .0001f;
             }
 
-            if (_tank.state == TankState.DEAD) {
-                totalReward -= 1;
-                collectReward = false;
-            }
 
             AddReward(totalReward);
+            
+            if (_tank.state == TankState.DEAD) {
+                SetReward(-1f);
+                collectReward = false;
+            }
         }
 
         public void TackleReward() {
@@ -122,13 +125,13 @@ namespace Tank.AI {
                 totalReward -= 0.001f;
             }
             else {
-                if (!_tank.tooCloseFlag && _tank.GetNormalizedSpeed() > .5f) {
+                if (!_tank.tooCloseFlag) {
                     //Facing forward
                     var transform1 = _tank.transform;
                     float forwardTackle = Vector3.Dot(transform1.forward.normalized,
                         (enemy.transform.position - transform1.position).normalized); // Is it facing the enemy ? 
 
-                    if (forwardTackle < 0.7f) return;
+                    if (forwardTackle < 0.2f) return;
 
 
                     float side =

@@ -17,6 +17,6 @@ default:
   use_curiosity: false
   curiosity_strength: 0.01
   curiosity_enc_size: 128
-  use_recurrent: true
+  use_recurrent: false
   memory_size: 128
   sequence_length: 16

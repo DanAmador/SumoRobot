@@ -11,21 +11,33 @@ namespace Tank {
     public class TankController : MonoBehaviour {
         #region Variables
 
-        [Header("Movement Properties")] public float rotationRate, turnRotationAngle, turnRotationSeekSpeed;
+        [Header("Movement Properties")] public float rotationRate;
+        public float turnRotationAngle;
+        public float turnRotationSeekSpeed;
 
         public TankState state;
 
-        [Header("Player Parameters")] [Range(3, 10), SerializeField]
-        private float MAX_SPECIAL = 5;
+
+        public float MaxSpecial {
+            get => MAX_SPECIAL;
+        }
+
+        [Header("Gameplay Values"), Range(5, 20), SerializeField]
+        private float MAX_SPECIAL = 15;
 
         [Range(800, 3000), SerializeField] private float MAX_SPEED = 2000;
         [Range(150, 500), SerializeField] private float START_SPEED = 300;
         [Range(1, 5), SerializeField] private float timeToStartMax = 2.5f;
+        [Range(0, 1)] public float special4Block = 0.4f;
+        [Range(0, 1)] public float special4Boost = 0.1f;
 
         private float _rotationVelocity, _groundAngleVelocity, _accelRatePerSec;
-        public bool onEdge, tooCloseFlag;
+
+        [Header("Internal variables")] public bool onEdge;
+
+        public bool tooCloseFlag => Vector3.Distance(lastCollisionPos, transform.position) < tooCloseLimit;
         [NonSerialized] public Vector3 lastCollisionPos;
-        public TankInputs _input;
+        [NonSerialized] public TankInputs _input;
         public float CurrSpeed { get; private set; }
         public float SpecialCounter { get; private set; }
 
@@ -34,6 +46,7 @@ namespace Tank {
         private Vector3 _initialPos;
         private Quaternion _initialRot;
         [SerializeField] private TankAgent _agent;
+        public float tooCloseLimit = 5;
 
         #region Getters
 
@@ -84,25 +97,19 @@ namespace Tank {
             SpecialCounter = Mathf.Clamp(SpecialCounter + Time.deltaTime, 0, MAX_SPECIAL);
 
 
-            if (tooCloseFlag) {
-                if (Vector3.Distance(lastCollisionPos, transform.position) > 9) {
-                    tooCloseFlag = false;
-                }
-            }
-
             if (state == TankState.NORMAL) {
                 CurrSpeed = Mathf.Clamp(CurrSpeed + Mathf.Abs(_input.ForwardInput) * _accelRatePerSec * Time.deltaTime,
                     START_SPEED, MAX_SPEED);
 
 
                 if (_input.Turbo) {
-                    if (SpecialCounter > 3) {
+                    if (SpecialCounter > MAX_SPECIAL * special4Boost) {
                         StartCoroutine(TurboBoost(SpecialCounter));
                     }
                 }
 
                 if (_input.Block) {
-                    if (SpecialCounter > 3) {
+                    if (SpecialCounter >= MAX_SPECIAL * special4Block) {
                         StartCoroutine(BlockRoutine());
                     }
                 }
@@ -130,36 +137,30 @@ namespace Tank {
         #region Collider Events
 
         //I really should've used a State or Observer Design pattern ... this is a fucking mess, but it's too late now, sorry :( 
-        void OnCollisionEnter(Collision collision) {
-            if (collision.gameObject.CompareTag("Player") && !tooCloseFlag) {
-   
-                if (state == TankState.BLOCK) {
-                    _rb.constraints = RigidbodyConstraints.FreezeAll;
-
-                    _agent.AddReward(.5f);
-                    return;
-                }
-
-
-                TankController collider = collision.gameObject.GetComponent<TankController>();
-                if (collider.state == TankState.BLOCK) {
-                    state = TankState.COLLIDED;
-                    _rb.AddForce(-2 * collision.impulse / Time.deltaTime);
-                }
-                else {
-                    collider.state = TankState.COLLIDED;
-                }
-
-
-                _agent.TackleReward();
-                
-                if (Vector3.Distance(lastCollisionPos, collision.transform.position) < 9) {
-                    tooCloseFlag = true;
-                }
-
-                lastCollisionPos = collider.transform.position;
-                CurrSpeed = START_SPEED;
+        private void OnCollisionEnter(Collision collision) {
+            if (!collision.gameObject.CompareTag("Player")) return;
+            if (state == TankState.BLOCK) {
+                _rb.constraints = RigidbodyConstraints.FreezeAll;
+                _agent.AddReward(.5f);
+                return;
             }
+
+
+            TankController collider = collision.gameObject.GetComponent<TankController>();
+            if (collider.state == TankState.BLOCK) {
+                state = TankState.COLLIDED;
+                _rb.AddForceAtPosition(collider.transform.position, -2 * collision.impulse / Time.deltaTime);
+            }
+            else {
+                collider.state = TankState.COLLIDED;
+            }
+
+            if (!tooCloseFlag) {
+                _agent.TackleReward();
+            }
+
+            lastCollisionPos = collider.transform.position;
+            CurrSpeed = START_SPEED;
         }
 
         private void OnCollisionExit(Collision collision) {
@@ -243,6 +244,7 @@ namespace Tank {
             yield return new WaitUntil(BlockPredicate);
 
             state = TankState.NORMAL;
+            _rb.constraints = RigidbodyConstraints.None;
         }
 
         private bool BlockPredicate() {
@@ -254,7 +256,7 @@ namespace Tank {
         }
 
         private IEnumerator TurboBoost(float currentSpecial) {
-            float fraction = (currentSpecial * currentSpecial) / MAX_SPECIAL;
+            float fraction = currentSpecial * currentSpecial / MAX_SPECIAL;
             state = TankState.BOOST;
             CurrSpeed += MAX_SPEED * fraction;
             yield return new WaitForSeconds(1);

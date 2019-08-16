@@ -47,7 +47,9 @@ namespace Tank.AI {
 
             AddVectorObs(normalized);
             AddVectorObs((int) _tank.state, Enum.GetValues(typeof(TankState)).Length);
-            AddVectorObs(_tank.GetNormalizedSpecial());
+            AddVectorObs(Mathf.Clamp(_tank.GetNormalizedSpecial() / _tank.special4Block, 0f, _tank.MaxSpecial / _tank.special4Block));
+            AddVectorObs(Mathf.Clamp(_tank.GetNormalizedSpecial() / _tank.special4Boost, 0f, _tank.MaxSpecial / _tank.special4Boost));
+            AddVectorObs(_tank.MaxSpecial);
             AddVectorObs(_tank.GetNormalizedSpeed());
             AddVectorObs(_tank.onEdge);
             AddVectorObs(_tank.transform.forward);
@@ -62,7 +64,7 @@ namespace Tank.AI {
             AddVectorObs((int) enemy.state, Enum.GetValues(typeof(TankState)).Length);
             AddVectorObs(Vector3.Dot(_tank.transform.forward.normalized, vecTo.normalized));
             AddVectorObs(enemy.GetNormalizedSpecial());
-            AddVectorObs(1 - Vector2.Distance(_tank.lastCollisionPos,_tank.transform.position )/9f);
+            AddVectorObs(1 - Vector2.Distance(_tank.lastCollisionPos, _tank.transform.position) / _tank.tooCloseLimit);
         }
 
         public override void AgentAction(float[] vectorAction, string textAction) {
@@ -93,25 +95,29 @@ namespace Tank.AI {
 ////            Debug.Log(totalReward.ToString("0.##########"));
 
 
-
             Monitor.Log("Reward", GetCumulativeReward(), transform);
         }
 
         private void NormalReward() {
             float totalReward = 0;
-            totalReward -= .0000005f;
+            totalReward -= .0005f;
 
             if (_tank.GetNormalizedSpeed() <= .4f) {
                 totalReward -= .0002f;
             }
 
             if (_tank.tooCloseFlag) {
-                totalReward -= .0001f;
+                totalReward -= .001f;
             }
 
+            if (_tank.onEdge) {
+                totalReward -= .0003f;
+            }
+            if (_tank.state == TankState.COLLIDED) {
+                totalReward -= 0.1f;
+            }
 
             AddReward(totalReward);
-            
             if (_tank.state == TankState.DEAD) {
                 SetReward(-1f);
                 collectReward = false;
@@ -122,34 +128,29 @@ namespace Tank.AI {
             float totalReward = 0;
 
 
-            if (_tank.state == TankState.COLLIDED) {
-                totalReward -= 0.001f;
-            }
-            else {
-                if (!_tank.tooCloseFlag) {
-                    //Facing forward
-                    var transform1 = _tank.transform;
-                    float forwardTackle = Vector3.Dot(transform1.forward.normalized,
-                        (enemy.transform.position - transform1.position).normalized); // Is it facing the enemy ?
-                    
-                    if (forwardTackle < 0.5f) return;
+            //Facing forward
+            var transform1 = _tank.transform;
+            float forwardTackle = Mathf.Abs(Vector3.Dot(transform1.forward.normalized,
+                (enemy.transform.position - transform1.position).normalized)); // Is it facing the enemy ?
+
+            if (forwardTackle < 0.5f || _tank.GetNormalizedSpeed() < 0.5f ||
+                _tank._input.ForwardInput < 0.5f) return;
 
 
-                    float side =
-                        Mathf.Abs(Vector3.Dot(_tank.transform.forward.normalized,
-                            enemy.transform.right.normalized)); // Is it attacking the enemy from the side?
+            float side =
+                Mathf.Abs(Vector3.Dot(_tank.transform.forward.normalized,
+                    enemy.transform.right.normalized)); // Is it attacking the enemy from the side?
 
-                    side = side >= .5f ? side : .5f;
+            side = side >= .5f ? side : .5f;
 
-                    totalReward += forwardTackle * side;
-                }
-            }
-
+            totalReward += forwardTackle * side;
             AddReward(totalReward);
         }
 
+
         private IEnumerator WaitBeforeReset(float time) {
             yield return new WaitForSeconds(time);
+
             Done();
             if (enemyAgent) {
                 enemyAgent.Done();

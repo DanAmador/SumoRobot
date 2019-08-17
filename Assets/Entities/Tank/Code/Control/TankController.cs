@@ -49,9 +49,10 @@ namespace Tank {
         private Vector3 _initialPos;
         private Quaternion _initialRot;
         [SerializeField] private TankAgent _agent;
-        public float tooCloseLimit = 10;
+        public float tooCloseLimit = 20;
 
         #region Getters
+
 
         public float GetNormalizedSpeed() {
             return (current_speed - START_SPEED) / (MAX_SPEED - START_SPEED);
@@ -102,7 +103,6 @@ namespace Tank {
         private void Update() {
             Debug.DrawLine(lastCollisionPos, lastCollisionPos + transform.up * 10);
             specialCounter = Mathf.Clamp(specialCounter + Time.deltaTime, 0, MAX_SPECIAL);
-
 
             if (state == TankState.NORMAL) {
                 current_speed = Mathf.Clamp(current_speed + Mathf.Abs(_input.ForwardInput) * _accelRatePerSec * Time.deltaTime,
@@ -156,6 +156,7 @@ namespace Tank {
 
             if (collider.state == TankState.BOOST) {
                 StartCoroutine(CollisionStateHandler());
+                specialCounter += MAX_SPECIAL * .3f;
             }
 
 
@@ -213,7 +214,7 @@ namespace Tank {
 
         #region Game Logic 
 
-        protected virtual void HandleMovement() {
+        private void HandleMovement() {
             float driftModifier = _input.Drift ? 0.5f : 1;
 
             if (Physics.Raycast(transform.position, transform.up * -1, _tm.distance)) {
@@ -227,15 +228,24 @@ namespace Tank {
             }
 
 
-            Vector3 turnTorque = rotationRate * _input.RotationInput * (1 / driftModifier) * Vector3.up;
 
-            turnTorque = Time.deltaTime * _rb.mass * turnTorque;
-            _rb.AddTorque(turnTorque);
+            if (GetNormalizedSpecial() > .1f) {
+             
+                Vector3 turnTorque = rotationRate * _input.RotationInput * (1 / driftModifier) * Vector3.up;
 
-            Vector3 newRotation = transform.eulerAngles;
-            newRotation.z = Mathf.SmoothDampAngle(newRotation.z, _input.RotationInput * -turnRotationAngle,
-                ref _rotationVelocity, turnRotationSeekSpeed);
-            transform.eulerAngles = newRotation;
+                turnTorque = Time.deltaTime * _rb.mass * turnTorque;
+                _rb.AddTorque(turnTorque);
+
+                Vector3 newRotation = transform.eulerAngles;
+                newRotation.z = Mathf.SmoothDampAngle(newRotation.z, _input.RotationInput * -turnRotationAngle,
+                    ref _rotationVelocity, turnRotationSeekSpeed);
+                transform.eulerAngles = newRotation;
+            
+            
+                specialCounter -= Mathf.Clamp(Mathf.Abs(_input.RotationInput) * 5, 0, MAX_SPECIAL) * Time.deltaTime;
+                Log(specialCounter);
+   
+            }
         }
 
         #endregion

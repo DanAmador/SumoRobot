@@ -23,7 +23,7 @@ namespace Tank.AI {
             _input = GetComponent<TankInputs>();
 //            _input.playerControl = false;
 
-            rayDistance = _tank.tooCloseLimit * 7;
+            rayDistance = _tank.tooCloseLimit * 3.6f;
             enemy = gs.getEnemy(_tank);
             enemyAgent = enemy.GetComponent<TankAgent>();
 
@@ -105,6 +105,11 @@ namespace Tank.AI {
                 totalReward -= .0002f;
             }
 
+            
+            if (_tank.GetNormalizedSpecial() <= .35f) {
+                totalReward -= .0002f;
+            }
+            
             if (_tank.tooCloseFlag) {
                 totalReward -= .0003f * (1 - Vector2.Distance(_tank.transform.position, _tank.lastCollisionPos) /
                                          _tank.tooCloseLimit);

@@ -243,7 +243,6 @@ namespace Tank {
             
             
                 specialCounter -= Mathf.Clamp(Mathf.Abs(_input.RotationInput) * 5, 0, MAX_SPECIAL) * Time.deltaTime;
-                Log(specialCounter);
    
             }
         }

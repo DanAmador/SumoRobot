@@ -94,8 +94,8 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaDirect: 0.5
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
-    m_ShowResolutionOverlay: 1
     m_ExportTrainingData: 0
+    m_TrainingDataDestination: TrainingData
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -169,9 +169,11 @@ MonoBehaviour:
   MAX_SPEED: 1000
   START_SPEED: 200
   timeToStartMax: 2.5
+  special4Block: 0.4
+  special4Boost: 0.1
   onEdge: 0
-  tooCloseFlag: 0
-  _input: {fileID: 0}
+  _agent: {fileID: 0}
+  tooCloseLimit: 5
 --- !u!114 &581615304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -200,6 +202,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerControl: 1
+  simulating: 1
 --- !u!54 &581615306
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -254,6 +257,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -393,7 +397,7 @@ GameObject:
   - component: {fileID: 1110735021}
   m_Layer: 0
   m_Name: Ground
-  m_TagString: Untagged
+  m_TagString: Platform
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -437,6 +441,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -500,6 +505,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c4cea0064f540498c8a536f657778f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tanks: []
 --- !u!4 &1617943534
 Transform:
   m_ObjectHideFlags: 0
@@ -581,6 +587,27 @@ PrefabInstance:
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2035671392, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: rotationRate
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 2035671393, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: simulating
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2035671393, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: playerControl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 956303407, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: brain
+      value: 
+      objectReference: {fileID: 11400000, guid: 93de719ecb70dd6488129510e1071b4d,
+        type: 2}
+    - target: {fileID: 956303407, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

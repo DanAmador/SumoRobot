@@ -13,7 +13,7 @@ namespace Tank.AI {
         private RayPerception3D _rayPerception;
         private bool collectReward;
 
-        private float rayDistance ;
+        private float rayDistance;
         private float[] rayAngles = {0f, 45f, 70f, 90f, 135f, 180f, 110f, 270};
         private String[] observables = {"Edge", "Player"};
 
@@ -47,8 +47,10 @@ namespace Tank.AI {
 
             AddVectorObs(normalized);
             AddVectorObs((int) _tank.state, Enum.GetValues(typeof(TankState)).Length);
-            AddVectorObs(Mathf.Clamp(_tank.GetNormalizedSpecial() / _tank.special4Block, 0f, _tank.MaxSpecial / _tank.special4Block));
-            AddVectorObs(Mathf.Clamp(_tank.GetNormalizedSpecial() / _tank.special4Boost, 0f, _tank.MaxSpecial / _tank.special4Boost));
+            AddVectorObs(Mathf.Clamp(_tank.GetNormalizedSpecial() / _tank.special4Block, 0f,
+                _tank.MaxSpecial / _tank.special4Block));
+            AddVectorObs(Mathf.Clamp(_tank.GetNormalizedSpecial() / _tank.special4Boost, 0f,
+                _tank.MaxSpecial / _tank.special4Boost));
             AddVectorObs(_tank.MaxSpecial);
             AddVectorObs(_tank.GetNormalizedSpeed());
             AddVectorObs(_tank.onEdge);
@@ -57,7 +59,7 @@ namespace Tank.AI {
             Transform enemyTransform = enemy.transform;
             Vector3 enemyPos = enemyTransform.position;
 
-            AddVectorObs(1 - Vector3.Distance(enemyPos, tankTransform.position) / 60);
+            AddVectorObs(Distance2Target());
             AddVectorObs(enemy.transform.forward);
             Vector3 vecTo = (enemyPos - transform.position);
             AddVectorObs(vecTo.normalized);
@@ -73,37 +75,41 @@ namespace Tank.AI {
             }
 
 
-            int forward = Mathf.FloorToInt(vectorAction[0]);
-            int rotation = Mathf.FloorToInt(vectorAction[1]);
-            int button = Mathf.FloorToInt(vectorAction[2]);
+            if (_input.simulating) {
+                int forward = Mathf.FloorToInt(vectorAction[0]);
+                int rotation = Mathf.FloorToInt(vectorAction[1]);
+                int button = Mathf.FloorToInt(vectorAction[2]);
 
-            if (forward == 1) _input.ForwardInput = 1;
-            if (forward == 2) _input.ForwardInput = -1;
+                if (forward == 1) _input.ForwardInput = 1;
+                if (forward == 2) _input.ForwardInput = -1;
 
-            if (rotation == 1) _input.RotationInput = 1;
-            if (rotation == 2) _input.RotationInput = -1;
+                if (rotation == 1) _input.RotationInput = 1;
+                if (rotation == 2) _input.RotationInput = -1;
 
-            if (button == 1) _input.VirtualInputSimulate(Buttons.BLOCK, 1f);
-            if (button == 2) _input.VirtualInputSimulate(Buttons.TURBO, 1f);
-            if (button == 3) _input.VirtualInputSimulate(Buttons.DRIFT);
+                if (button == 1) _input.VirtualInputSimulate(Buttons.BLOCK, 1f);
+                if (button == 2) _input.VirtualInputSimulate(Buttons.TURBO, 1f);
+                if (button == 3) _input.VirtualInputSimulate(Buttons.DRIFT);
 
 
-            if (collectReward) NormalReward();
+                if (collectReward) NormalReward();
+            }
 //            Vector3 vecTo = (enemy.transform.position - transform.position);
 //            Debug.Log("Reward: " + GetReward() );
 ////            Debug.Log("Cumulative: " + GetCumulativeReward() );
 ////            Debug.Log(totalReward.ToString("0.##########"));
 
 
-            Monitor.Log("Reward", GetReward(), transform);
+            Monitor.Log("Reward", GetCumulativeReward(), transform);
         }
 
         private void NormalReward() {
             float totalReward = 0;
-            totalReward -= .0000005f;
+
+            float forwardAbs = 1 - Mathf.Abs(ForwardDot());
+            totalReward -= .00005f * (1 - Distance2Target());
 
             if (_tank.GetNormalizedSpeed() <= .4f) {
-                totalReward -= .00002f;
+                totalReward -= .0002f * forwardAbs;
             }
 
             if (_tank.tooCloseFlag) {
@@ -113,9 +119,7 @@ namespace Tank.AI {
             if (_tank.onEdge) {
                 totalReward -= .0003f;
             }
-            if (_tank.state == TankState.COLLIDED) {
-                totalReward -= 0.1f;
-            }
+
 
             AddReward(totalReward);
             if (_tank.state == TankState.DEAD) {
@@ -129,12 +133,10 @@ namespace Tank.AI {
 
 
             //Facing forward
-            var transform1 = _tank.transform;
-            float forwardTackle = Mathf.Abs(Vector3.Dot(transform1.forward.normalized,
-                (enemy.transform.position - transform1.position).normalized)); // Is it facing the enemy ?
+            float forwardTackle = ForwardDot();
 
-            if (forwardTackle < 0.5f || _tank.GetNormalizedSpeed() < 0.5f ||
-                _tank._input.ForwardInput < 0.5f) return;
+            if (forwardTackle < 0.3f || _tank.GetNormalizedSpeed() < 0.2f ||
+                Mathf.Abs(_tank._input.ForwardInput) < 0.5f) return;
 
 
             float side =
@@ -159,19 +161,22 @@ namespace Tank.AI {
 
         public override void AgentReset() {
             gs.Reset();
+
             collectReward = true;
-
-            StartCoroutine(ResetWait());
         }
-        
-        
-        private IEnumerator ResetWait() {
-            //Wait 2 seconds in case the physics are glitchy
-            _input.simulating = false;
-            yield return new WaitForSeconds(2);
 
-            _input.simulating = true;
+
+        private float Distance2Target() {
+            return Vector3.Distance(enemy.transform.position, _tank.transform.position) / 50;
         }
+
+        // Is it facing the enemy ?
+        private float ForwardDot() {
+            var transform1 = _tank.transform;
+            return Mathf.Abs(Vector3.Dot(transform1.forward.normalized,
+                (enemy.transform.position - transform1.position).normalized));
+        }
+
+
     }
-    
 }

@@ -79,6 +79,7 @@ namespace Tank {
 
 
         public void Reset() {
+            _tm.ToggleThrust();
             lastCollisionPos = _initialPos;
             _rb.velocity = Vector3.zero;
             _rb.angularVelocity = Vector3.zero;
@@ -90,6 +91,8 @@ namespace Tank {
             SpecialCounter = 0;
 
             _rb.constraints = RigidbodyConstraints.None;
+            StartCoroutine(ResetWait());
+
         }
 
         private void Update() {
@@ -124,11 +127,6 @@ namespace Tank {
 
 
         void FixedUpdate() {
-            if (state == TankState.COLLIDED) {
-                state = TankState.NORMAL;
-                CurrSpeed = START_SPEED;
-            }
-
             if (_rb && _input && _tm) {
                 HandleMovement();
             }
@@ -145,15 +143,17 @@ namespace Tank {
                 return;
             }
 
-
             TankController collider = collision.gameObject.GetComponent<TankController>();
+            if (collider.Equals(this)) return;
             if (collider.state == TankState.BLOCK) {
-                state = TankState.COLLIDED;
+                StartCoroutine(CollisionStateHandler());
                 _rb.AddForceAtPosition(collider.transform.position, -2 * collision.impulse / Time.deltaTime);
             }
-            else {
-                collider.state = TankState.COLLIDED;
+
+            if (collider.state == TankState.BOOST) {
+                StartCoroutine(CollisionStateHandler());
             }
+
 
             if (!tooCloseFlag) {
                 _agent.TackleReward();
@@ -165,7 +165,6 @@ namespace Tank {
 
         private void OnCollisionExit(Collision collision) {
             if (collision.gameObject.CompareTag("Player")) {
-                TankController collider = collision.gameObject.GetComponent<TankController>();
                 if (state == TankState.BLOCK) {
                     _rb.constraints = RigidbodyConstraints.None;
                 }
@@ -266,6 +265,21 @@ namespace Tank {
             CurrSpeed = MAX_SPEED;
         }
 
+        private IEnumerator CollisionStateHandler() {
+            state = TankState.COLLIDED;
+            CurrSpeed = START_SPEED;
+            _agent.AddReward(-.0005f);
+            yield return new WaitForSeconds(1);
+
+            state = TankState.NORMAL;
+        }
+
+        private IEnumerator ResetWait() {
+            //Wait 2 seconds in case the physics are glitchy
+
+            yield return new WaitForSeconds(2);
+            _tm.ToggleThrust();
+        }
         #endregion
 
         #endregion

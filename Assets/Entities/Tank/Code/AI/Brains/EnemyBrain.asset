@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41e9bda8f3cf1492fa74926a530f6f70, type: 3}
-  m_Name: TeacherBrain
+  m_Script: {fileID: 11500000, guid: 8b23992c8eb17439887f5e944bf04a40, type: 3}
+  m_Name: EnemyBrain
   m_EditorClassIdentifier: 
   brainParameters:
     vectorObservationSize: 95
@@ -22,27 +22,5 @@ MonoBehaviour:
     - Rotation
     - Buttons
     vectorActionSpaceType: 0
-  keyContinuousPlayerActions: []
-  axisContinuousPlayerActions: []
-  discretePlayerActions:
-  - key: 119
-    branchIndex: 0
-    value: 1
-  - key: 115
-    branchIndex: 0
-    value: 2
-  - key: 97
-    branchIndex: 1
-    value: 1
-  - key: 100
-    branchIndex: 1
-    value: 2
-  - key: 32
-    branchIndex: 2
-    value: 2
-  - key: 113
-    branchIndex: 2
-    value: 1
-  - key: 101
-    branchIndex: 2
-    value: 3
+  model: {fileID: 7247234530120733645, guid: 8fbc3aab43f320a4485664e2469c53d3, type: 3}
+  inferenceDevice: 0

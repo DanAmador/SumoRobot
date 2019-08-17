@@ -47,10 +47,8 @@ namespace Tank.AI {
 
             AddVectorObs(normalized);
             AddVectorObs((int) _tank.state, Enum.GetValues(typeof(TankState)).Length);
-            AddVectorObs(Mathf.Clamp(_tank.GetNormalizedSpecial() / _tank.special4Block, 0f,
-                _tank.MaxSpecial / _tank.special4Block));
-            AddVectorObs(Mathf.Clamp(_tank.GetNormalizedSpecial() / _tank.special4Boost, 0f,
-                _tank.MaxSpecial / _tank.special4Boost));
+            AddVectorObs(Mathf.Clamp(1 - (_tank.GetNormalizedSpecial() / _tank.special4Block) * 5, 0f, 1f));
+            AddVectorObs(Mathf.Clamp(1 - _tank.GetNormalizedSpecial() / _tank.special4Boost, 0f, _tank.special4Boost));
             AddVectorObs(_tank.MaxSpecial);
             AddVectorObs(_tank.GetNormalizedSpeed());
             AddVectorObs(_tank.onEdge);
@@ -70,11 +68,6 @@ namespace Tank.AI {
         }
 
         public override void AgentAction(float[] vectorAction, string textAction) {
-            if (enemy.state == TankState.DEAD || _tank.state == TankState.DEAD) {
-                StartCoroutine(WaitBeforeReset(0));
-            }
-
-
             if (_input.simulating) {
                 int forward = Mathf.FloorToInt(vectorAction[0]);
                 int rotation = Mathf.FloorToInt(vectorAction[1]);
@@ -93,10 +86,11 @@ namespace Tank.AI {
 
                 if (collectReward) NormalReward();
             }
+
 //            Vector3 vecTo = (enemy.transform.position - transform.position);
 //            Debug.Log("Reward: " + GetReward() );
-////            Debug.Log("Cumulative: " + GetCumulativeReward() );
-////            Debug.Log(totalReward.ToString("0.##########"));
+//            Debug.Log($"Cumulative: {GetCumulativeReward()}");
+//            Debug.Log(totalReward.ToString("0.##########"));
 
 
             Monitor.Log("Reward", GetCumulativeReward(), transform);
@@ -105,15 +99,15 @@ namespace Tank.AI {
         private void NormalReward() {
             float totalReward = 0;
 
-            float forwardAbs = 1 - Mathf.Abs(ForwardDot());
             totalReward -= .00005f * (1 - Distance2Target());
 
             if (_tank.GetNormalizedSpeed() <= .4f) {
-                totalReward -= .0002f * forwardAbs;
+                totalReward -= .0002f;
             }
 
             if (_tank.tooCloseFlag) {
-                totalReward -= .00001f;
+                totalReward -= .0003f * (1 - Vector2.Distance(_tank.transform.position, _tank.lastCollisionPos) /
+                                         _tank.tooCloseLimit);
             }
 
             if (_tank.onEdge) {
@@ -123,20 +117,42 @@ namespace Tank.AI {
 
             AddReward(totalReward);
             if (_tank.state == TankState.DEAD) {
-                SetReward(-1f);
+                if (GetCumulativeReward() > 0) {
+                    SetReward(-1f);
+                }
+                else {
+                    AddReward(-1f);
+                }
+
+                StartCoroutine(WaitBeforeReset(0));
+
                 collectReward = false;
+            }
+
+            if (enemy.state == TankState.DEAD) {
+                if (enemy.TimeSinceLastCollision < 5) {
+                    if (GetCumulativeReward() < 0) {
+                        SetReward(1f);
+                    }
+                    else {
+                        AddReward(1f);
+                    }
+
+                    collectReward = false;
+                }
+
+                StartCoroutine(WaitBeforeReset(0));
             }
         }
 
-        public void TackleReward() {
+        public void TackleReward(Vector3 col) {
             float totalReward = 0;
 
 
             //Facing forward
-            float forwardTackle = ForwardDot();
+            float forwardTackle = ForwardDot(col);
 
-            if (forwardTackle < 0.3f || _tank.GetNormalizedSpeed() < 0.6f ||
-                Mathf.Abs(_tank._input.ForwardInput) < 0.5f) return;
+            if (forwardTackle < 0.5f || _tank.GetNormalizedSpeed() < 0.5f) return;
 
 
             float side =
@@ -144,7 +160,7 @@ namespace Tank.AI {
                     enemy.transform.right.normalized)); // Is it attacking the enemy from the side?
 
             side = side >= .5f ? side : .5f;
-            totalReward += forwardTackle * side * (_tank.state == TankState.BOOST ? 1 : .1f);
+            totalReward += forwardTackle * side * (_tank.state == TankState.BOOST ? 1 : .3f);
             AddReward(totalReward);
         }
 
@@ -153,9 +169,7 @@ namespace Tank.AI {
             yield return new WaitForSeconds(time);
 
             Done();
-            if (enemyAgent) {
-                enemyAgent.Done();
-            }
+            enemyAgent.Done();
         }
 
         public override void AgentReset() {
@@ -170,11 +184,14 @@ namespace Tank.AI {
 
         // Is it facing the enemy ?
         private float ForwardDot() {
-            var transform1 = _tank.transform;
-            return Mathf.Abs(Vector3.Dot(transform1.forward.normalized,
-                (enemy.transform.position - transform1.position).normalized));
+            return ForwardDot(Vector3.zero);
         }
 
-
+        private float ForwardDot(Vector3 c) {
+            var transform1 = _tank.transform;
+            Vector3 toCheck = c == Vector3.zero ? enemy.transform.position : c;
+            return Mathf.Abs(Vector3.Dot(transform1.forward,
+                (toCheck - transform1.position).normalized));
+        }
     }
 }

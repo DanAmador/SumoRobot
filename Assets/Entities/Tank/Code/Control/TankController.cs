@@ -16,8 +16,10 @@ namespace Tank {
         public float turnRotationSeekSpeed;
 
         public TankState state;
-
-
+    
+        public float TimeSinceLastCollision {
+            get => lastCollisionPos == _initialPos ? 0 : Time.time - lastColTime;
+        }
         public float MaxSpecial {
             get => MAX_SPECIAL;
         }
@@ -25,21 +27,22 @@ namespace Tank {
         [Header("Gameplay Values"), Range(5, 20), SerializeField]
         private float MAX_SPECIAL = 15;
 
+
         [Range(800, 3000), SerializeField] private float MAX_SPEED = 2000;
         [Range(150, 500), SerializeField] private float START_SPEED = 300;
-        [Range(1, 5), SerializeField] private float timeToStartMax = 2.5f;
+        [Range(1, 5), SerializeField] private float timeToMaxSpeed = 2.5f;
         [Range(0, 1)] public float special4Block = 0.4f;
         [Range(0, 1)] public float special4Boost = 0.1f;
 
-        private float _rotationVelocity, _groundAngleVelocity, _accelRatePerSec;
-
+        private float _rotationVelocity, _groundAngleVelocity, _accelRatePerSec, lastColTime;
+        
         [Header("Internal variables")] public bool onEdge;
 
         public bool tooCloseFlag => Vector3.Distance(lastCollisionPos, transform.position) < tooCloseLimit;
         [NonSerialized] public Vector3 lastCollisionPos;
         [NonSerialized] public TankInputs _input;
-        public float CurrSpeed { get; private set; }
-        public float SpecialCounter { get; private set; }
+        public float current_speed { get; private set; }
+        public float specialCounter { get; private set; }
 
         private Rigidbody _rb;
         private ThrusterManager _tm;
@@ -51,11 +54,11 @@ namespace Tank {
         #region Getters
 
         public float GetNormalizedSpeed() {
-            return (CurrSpeed - START_SPEED) / (MAX_SPEED - START_SPEED);
+            return (current_speed - START_SPEED) / (MAX_SPEED - START_SPEED);
         }
 
         public float GetNormalizedSpecial() {
-            return SpecialCounter / MAX_SPECIAL;
+            return specialCounter / MAX_SPECIAL;
         }
 
         #endregion
@@ -67,11 +70,11 @@ namespace Tank {
 
         void Start() {
             _agent = GetComponent<TankAgent>();
-            _accelRatePerSec = (MAX_SPEED - START_SPEED) / timeToStartMax;
+            _accelRatePerSec = (MAX_SPEED - START_SPEED) / timeToMaxSpeed;
             _rb = GetComponent<Rigidbody>();
             _tm = GetComponent<ThrusterManager>();
             _input = GetComponent<TankInputs>();
-            CurrSpeed = START_SPEED;
+            current_speed = START_SPEED;
             state = TankState.NORMAL;
             _initialPos = transform.position;
             _initialRot = transform.rotation;
@@ -81,14 +84,16 @@ namespace Tank {
         public void Reset() {
             _tm.ToggleThrust();
             lastCollisionPos = _initialPos;
-            _rb.velocity = Vector3.zero;
-            _rb.angularVelocity = Vector3.zero;
+
 
             transform.position = _initialPos;
             transform.rotation = _initialRot;
+            _rb.velocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
+            _rb.isKinematic = true;
             state = TankState.NORMAL;
-            CurrSpeed = START_SPEED;
-            SpecialCounter = 0;
+            current_speed = START_SPEED;
+            specialCounter = 0;
 
             _rb.constraints = RigidbodyConstraints.None;
             StartCoroutine(ResetWait());
@@ -96,30 +101,30 @@ namespace Tank {
 
         private void Update() {
             Debug.DrawLine(lastCollisionPos, lastCollisionPos + transform.up * 10);
-            SpecialCounter = Mathf.Clamp(SpecialCounter + Time.deltaTime, 0, MAX_SPECIAL);
+            specialCounter = Mathf.Clamp(specialCounter + Time.deltaTime, 0, MAX_SPECIAL);
 
 
             if (state == TankState.NORMAL) {
-                CurrSpeed = Mathf.Clamp(CurrSpeed + Mathf.Abs(_input.ForwardInput) * _accelRatePerSec * Time.deltaTime,
+                current_speed = Mathf.Clamp(current_speed + Mathf.Abs(_input.ForwardInput) * _accelRatePerSec * Time.deltaTime,
                     START_SPEED, MAX_SPEED);
 
 
                 if (_input.Turbo) {
-                    if (SpecialCounter > MAX_SPECIAL * special4Boost) {
-                        StartCoroutine(TurboBoost(SpecialCounter));
+                    if (specialCounter > MAX_SPECIAL * special4Boost) {
+                        StartCoroutine(TurboBoost(specialCounter));
                     }
                 }
 
                 if (_input.Block) {
-                    if (SpecialCounter >= MAX_SPECIAL * special4Block) {
+                    if (specialCounter >= MAX_SPECIAL * special4Block) {
                         StartCoroutine(BlockRoutine());
                     }
                 }
 
 
                 if (Mathf.Abs(_input.ForwardInput) < .50f) {
-                    CurrSpeed = Mathf.Clamp(
-                        CurrSpeed - Mathf.Abs(_input.ForwardInput) * _accelRatePerSec * Time.deltaTime * .5f,
+                    current_speed = Mathf.Clamp(
+                        current_speed - Mathf.Abs(_input.ForwardInput) * _accelRatePerSec * Time.deltaTime * .5f,
                         START_SPEED, MAX_SPEED);
                 }
             }
@@ -139,7 +144,7 @@ namespace Tank {
             if (!collision.gameObject.CompareTag("Player")) return;
             if (state == TankState.BLOCK) {
                 _rb.constraints = RigidbodyConstraints.FreezeAll;
-                _agent.AddReward(.5f);
+                _agent.AddReward(1);
                 return;
             }
 
@@ -155,13 +160,15 @@ namespace Tank {
 
 
             if (!tooCloseFlag) {
-                _agent.TackleReward();
-                lastCollisionPos = collider.transform.position;
+                var position = collision.transform.position;
+                _agent.TackleReward(position);
+                lastCollisionPos = position;
+                lastColTime = Time.time;
             }
 
 
             if (state != TankState.BOOST) {
-                CurrSpeed = START_SPEED;
+                current_speed = START_SPEED;
             }
         }
 
@@ -211,7 +218,7 @@ namespace Tank {
 
             if (Physics.Raycast(transform.position, transform.up * -1, _tm.distance)) {
                 _rb.drag = 1 * (1 / driftModifier);
-                Vector3 forwardForce = CurrSpeed * _input.ForwardInput * driftModifier * transform.forward;
+                Vector3 forwardForce = current_speed * _input.ForwardInput * driftModifier * transform.forward;
                 forwardForce = Time.deltaTime * _rb.mass * forwardForce;
                 _rb.AddForce(forwardForce);
             }
@@ -252,18 +259,18 @@ namespace Tank {
             _rb.AddForce(-_rb.velocity);
             _rb.velocity = Vector3.zero;
             _rb.position = transform.position;
-            SpecialCounter -= Time.deltaTime * 5;
-            return !_input.Block || SpecialCounter <= 0;
+            specialCounter -= Time.deltaTime * 5;
+            return !_input.Block || specialCounter <= 0;
         }
 
         private IEnumerator TurboBoost(float currentSpecial) {
             float fraction = currentSpecial * currentSpecial / MAX_SPECIAL;
             state = TankState.BOOST;
-            CurrSpeed += MAX_SPEED * fraction;
+            current_speed += MAX_SPEED * fraction;
             yield return new WaitForSeconds(1);
 
-            SpecialCounter = 0;
-            CurrSpeed = MAX_SPEED;
+            specialCounter = 0;
+            current_speed = MAX_SPEED;
 
             yield return new WaitForSeconds(.5f);
 
@@ -272,7 +279,7 @@ namespace Tank {
 
         private IEnumerator CollisionStateHandler() {
             state = TankState.COLLIDED;
-            CurrSpeed = START_SPEED;
+            current_speed = START_SPEED;
             _agent.AddReward(-.005f);
             yield return new WaitForSeconds(1);
 
@@ -280,8 +287,10 @@ namespace Tank {
         }
 
         private IEnumerator ResetWait() {
-            yield return new WaitForSeconds(2);
+            yield return new WaitForSeconds(1);
             _tm.ToggleThrust();
+            _rb.isKinematic = false;
+
         }
 
         #endregion

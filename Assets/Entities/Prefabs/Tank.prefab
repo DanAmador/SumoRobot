@@ -781,9 +781,9 @@ MonoBehaviour:
   turnRotationSeekSpeed: 5
   state: 0
   MAX_SPECIAL: 15
-  MAX_SPEED: 2000
+  MAX_SPEED: 3000
   START_SPEED: 300
-  timeToStartMax: 2.5
+  timeToMaxSpeed: 1.7
   special4Block: 0.4
   special4Boost: 0.1
   onEdge: 0
@@ -801,7 +801,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64b2554ce16b09c45b75f83267c704ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerControl: 1
+  playerControl: 0
   simulating: 1
 --- !u!114 &956303407
 MonoBehaviour:
@@ -853,7 +853,6 @@ MonoBehaviour:
   - {fileID: 1128865588}
   - {fileID: 186549535}
   - {fileID: 1042684518}
-  working: 1
   strength: 1200
   distance: 2
   ps: {fileID: 699849297383026203, guid: 8bbeb0baec0fd5e4d85c80824657b9d4, type: 3}

@@ -135,7 +135,7 @@ namespace Tank.AI {
             //Facing forward
             float forwardTackle = ForwardDot();
 
-            if (forwardTackle < 0.3f || _tank.GetNormalizedSpeed() < 0.2f ||
+            if (forwardTackle < 0.3f || _tank.GetNormalizedSpeed() < 0.6f ||
                 Mathf.Abs(_tank._input.ForwardInput) < 0.5f) return;
 
 
@@ -144,8 +144,7 @@ namespace Tank.AI {
                     enemy.transform.right.normalized)); // Is it attacking the enemy from the side?
 
             side = side >= .5f ? side : .5f;
-
-            totalReward += forwardTackle * side;
+            totalReward += forwardTackle * side * (_tank.state == TankState.BOOST ? 1 : .1f);
             AddReward(totalReward);
         }
 
@@ -161,7 +160,6 @@ namespace Tank.AI {
 
         public override void AgentReset() {
             gs.Reset();
-
             collectReward = true;
         }
 

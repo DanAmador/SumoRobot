@@ -16,13 +16,21 @@ namespace Tank {
         public float turnRotationSeekSpeed;
 
         public TankState state;
-    
+
+
         public float TimeSinceLastCollision {
-            get => lastCollisionPos == _initialPos ? 0 : Time.time - lastColTime;
+            get => lastCollisionPos == _initialPos ? 0 : Time.time - _lastColTime;
         }
+
         public float MaxSpecial {
             get => MAX_SPECIAL;
         }
+
+        public bool TooCloseFlag => Vector3.Distance(lastCollisionPos, transform.position) < tooCloseLimit;
+        private float CurrentSpeed { get; set; }
+        private float SpecialCounter { get; set; }
+        public bool MustFleeFromCollision => TimeSinceLastCollision < 5;
+
 
         [Header("Gameplay Values"), Range(5, 20), SerializeField]
         private float MAX_SPECIAL = 15;
@@ -31,19 +39,16 @@ namespace Tank {
         [Range(800, 3000), SerializeField] private float MAX_SPEED = 2000;
         [Range(150, 500), SerializeField] private float START_SPEED = 300;
         [Range(1, 5), SerializeField] private float timeToMaxSpeed = 2.5f;
+        [Range(4, 10), SerializeField] private float timeToMaxSpecial = 5f;
         [Range(0, 1)] public float special4Block = 0.4f;
         [Range(0, 1)] public float special4Boost = 0.1f;
 
-        private float _rotationVelocity, _groundAngleVelocity, _accelRatePerSec, lastColTime;
-        
+        private float _rotationVelocity, _groundAngleVelocity, _accelRatePerSec, _lastColTime, specialRatePerSec;
+
         [Header("Internal variables")] public bool onEdge;
 
-        public bool tooCloseFlag => Vector3.Distance(lastCollisionPos, transform.position) < tooCloseLimit;
         [NonSerialized] public Vector3 lastCollisionPos;
         [NonSerialized] public TankInputs _input;
-        public float current_speed { get; private set; }
-        public float specialCounter { get; private set; }
-
         private Rigidbody _rb;
         private ThrusterManager _tm;
         private Vector3 _initialPos;
@@ -53,13 +58,14 @@ namespace Tank {
 
         #region Getters
 
-
         public float GetNormalizedSpeed() {
-            return (current_speed - START_SPEED) / (MAX_SPEED - START_SPEED);
+            if (state == TankState.BLOCK) return 0;
+
+            return (CurrentSpeed - START_SPEED) / (MAX_SPEED - START_SPEED);
         }
 
         public float GetNormalizedSpecial() {
-            return specialCounter / MAX_SPECIAL;
+            return SpecialCounter / MAX_SPECIAL;
         }
 
         #endregion
@@ -72,10 +78,11 @@ namespace Tank {
         void Start() {
             _agent = GetComponent<TankAgent>();
             _accelRatePerSec = (MAX_SPEED - START_SPEED) / timeToMaxSpeed;
+            specialRatePerSec = MAX_SPECIAL / timeToMaxSpecial;
             _rb = GetComponent<Rigidbody>();
             _tm = GetComponent<ThrusterManager>();
             _input = GetComponent<TankInputs>();
-            current_speed = START_SPEED;
+            CurrentSpeed = START_SPEED;
             state = TankState.NORMAL;
             _initialPos = transform.position;
             _initialRot = transform.rotation;
@@ -93,8 +100,8 @@ namespace Tank {
             _rb.angularVelocity = Vector3.zero;
             _rb.isKinematic = true;
             state = TankState.NORMAL;
-            current_speed = START_SPEED;
-            specialCounter = 0;
+            CurrentSpeed = START_SPEED;
+            SpecialCounter = 0;
 
             _rb.constraints = RigidbodyConstraints.None;
             StartCoroutine(ResetWait());
@@ -102,31 +109,36 @@ namespace Tank {
 
         private void Update() {
             Debug.DrawLine(lastCollisionPos, lastCollisionPos + transform.up * 10);
-            specialCounter = Mathf.Clamp(specialCounter + Time.deltaTime, 0, MAX_SPECIAL);
 
             if (state == TankState.NORMAL) {
-                current_speed = Mathf.Clamp(current_speed + Mathf.Abs(_input.ForwardInput) * _accelRatePerSec * Time.deltaTime,
+                SpecialCounter =
+                    Mathf.Clamp(
+                        SpecialCounter + (Mathf.Log(1 + GetNormalizedSpeed() * 5) + 1) * specialRatePerSec *
+                        Time.deltaTime,
+                        0, MAX_SPECIAL);
+
+                CurrentSpeed = Mathf.Clamp(
+                    CurrentSpeed + Mathf.Abs(_input.ForwardInput) * _accelRatePerSec * Time.deltaTime,
                     START_SPEED, MAX_SPEED);
 
 
                 if (_input.Turbo) {
-                    if (specialCounter > MAX_SPECIAL * special4Boost) {
-                        StartCoroutine(TurboBoost(specialCounter));
+                    if (SpecialCounter > MAX_SPECIAL * special4Boost) {
+                        StartCoroutine(TurboBoost(SpecialCounter));
                     }
                 }
 
                 if (_input.Block) {
-                    if (specialCounter >= MAX_SPECIAL * special4Block) {
+                    if (SpecialCounter >= MAX_SPECIAL * special4Block) {
                         StartCoroutine(BlockRoutine());
                     }
                 }
+            }
 
-
-                if (Mathf.Abs(_input.ForwardInput) < .50f) {
-                    current_speed = Mathf.Clamp(
-                        current_speed - Mathf.Abs(_input.ForwardInput) * _accelRatePerSec * Time.deltaTime * .5f,
-                        START_SPEED, MAX_SPEED);
-                }
+            if (Mathf.Abs(_input.ForwardInput) < .50f) {
+                CurrentSpeed = Mathf.Clamp(
+                    CurrentSpeed - _accelRatePerSec * Time.deltaTime * .25f,
+                    START_SPEED, MAX_SPEED);
             }
         }
 
@@ -156,20 +168,20 @@ namespace Tank {
 
             if (collider.state == TankState.BOOST) {
                 StartCoroutine(CollisionStateHandler());
-                specialCounter += MAX_SPECIAL * .3f;
+                SpecialCounter += MAX_SPECIAL * .3f;
             }
 
 
-            if (!tooCloseFlag) {
+            if (!TooCloseFlag || !MustFleeFromCollision) {
                 var position = collision.transform.position;
                 _agent.TackleReward(position);
                 lastCollisionPos = position;
-                lastColTime = Time.time;
+                _lastColTime = Time.time;
             }
 
 
             if (state != TankState.BOOST) {
-                current_speed = START_SPEED;
+                CurrentSpeed = START_SPEED;
             }
         }
 
@@ -219,7 +231,7 @@ namespace Tank {
 
             if (Physics.Raycast(transform.position, transform.up * -1, _tm.distance)) {
                 _rb.drag = 1 * (1 / driftModifier);
-                Vector3 forwardForce = current_speed * _input.ForwardInput * driftModifier * transform.forward;
+                Vector3 forwardForce = CurrentSpeed * _input.ForwardInput * driftModifier * transform.forward;
                 forwardForce = Time.deltaTime * _rb.mass * forwardForce;
                 _rb.AddForce(forwardForce);
             }
@@ -228,23 +240,20 @@ namespace Tank {
             }
 
 
+            float turnMod = GetNormalizedSpecial() > .1f ? 1 : .5f;
 
-            if (GetNormalizedSpecial() > .1f) {
-             
-                Vector3 turnTorque = rotationRate * _input.RotationInput * (1 / driftModifier) * Vector3.up;
+            Vector3 turnTorque = turnMod * rotationRate * _input.RotationInput * (1 / driftModifier) * Vector3.up;
 
-                turnTorque = Time.deltaTime * _rb.mass * turnTorque;
-                _rb.AddTorque(turnTorque);
+            turnTorque = Time.deltaTime * _rb.mass * turnTorque;
+            _rb.AddTorque(turnTorque);
 
-                Vector3 newRotation = transform.eulerAngles;
-                newRotation.z = Mathf.SmoothDampAngle(newRotation.z, _input.RotationInput * -turnRotationAngle,
-                    ref _rotationVelocity, turnRotationSeekSpeed);
-                transform.eulerAngles = newRotation;
-            
-            
-                specialCounter -= Mathf.Clamp(Mathf.Abs(_input.RotationInput) * 5, 0, MAX_SPECIAL) * Time.deltaTime;
-   
-            }
+            Vector3 newRotation = transform.eulerAngles;
+            newRotation.z = Mathf.SmoothDampAngle(newRotation.z, _input.RotationInput * -turnRotationAngle,
+                ref _rotationVelocity, turnRotationSeekSpeed);
+            transform.eulerAngles = newRotation;
+
+
+            SpecialCounter -= Mathf.Clamp(Mathf.Abs(_input.RotationInput) * 5, 0, MAX_SPECIAL) * Time.deltaTime;
         }
 
         #endregion
@@ -268,18 +277,18 @@ namespace Tank {
             _rb.AddForce(-_rb.velocity);
             _rb.velocity = Vector3.zero;
             _rb.position = transform.position;
-            specialCounter -= Time.deltaTime * 5;
-            return !_input.Block || specialCounter <= 0;
+            SpecialCounter -= specialRatePerSec * Time.deltaTime * 5;
+            return !_input.Block || SpecialCounter <= 0;
         }
 
         private IEnumerator TurboBoost(float currentSpecial) {
-            float fraction = currentSpecial * currentSpecial / MAX_SPECIAL;
             state = TankState.BOOST;
-            current_speed += MAX_SPEED * fraction;
+            float oldSpeed = CurrentSpeed;
+            CurrentSpeed =  Mathf.Clamp(CurrentSpeed + CurrentSpeed *GetNormalizedSpecial()*2, CurrentSpeed, MAX_SPEED*1.5f);
             yield return new WaitForSeconds(1);
 
-            specialCounter = 0;
-            current_speed = MAX_SPEED;
+            SpecialCounter = 0;
+            CurrentSpeed = oldSpeed;
 
             yield return new WaitForSeconds(.5f);
 
@@ -288,7 +297,7 @@ namespace Tank {
 
         private IEnumerator CollisionStateHandler() {
             state = TankState.COLLIDED;
-            current_speed = START_SPEED;
+            CurrentSpeed = START_SPEED;
             _agent.AddReward(-.005f);
             yield return new WaitForSeconds(1);
 
@@ -299,7 +308,6 @@ namespace Tank {
             yield return new WaitForSeconds(1);
             _tm.ToggleThrust();
             _rb.isKinematic = false;
-
         }
 
         #endregion

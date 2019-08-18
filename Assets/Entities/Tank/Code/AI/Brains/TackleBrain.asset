@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TackleBrain
   m_EditorClassIdentifier: 
   brainParameters:
-    vectorObservationSize: 95
+    vectorObservationSize: 96
     numStackedVectorObservations: 1
     vectorActionSize: 030000000300000004000000
     cameraResolutions: []
@@ -22,5 +22,5 @@ MonoBehaviour:
     - Rotation
     - Buttons
     vectorActionSpaceType: 0
-  model: {fileID: -6785226784583654059, guid: f9f1e56319c428043adf5c305419f5be, type: 3}
+  model: {fileID: 0}
   inferenceDevice: 0

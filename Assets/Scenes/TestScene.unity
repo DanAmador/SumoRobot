@@ -168,7 +168,8 @@ MonoBehaviour:
   MAX_SPECIAL: 5
   MAX_SPEED: 1000
   START_SPEED: 200
-  timeToStartMax: 2.5
+  timeToMaxSpeed: 2.5
+  timeToMaxSpecial: 5
   special4Block: 0.4
   special4Boost: 0.1
   onEdge: 0

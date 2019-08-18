@@ -24,7 +24,7 @@ namespace Tank.AI {
 //            _input.playerControl = false;
 
             rayDistance = _tank.tooCloseLimit * 2;
-            _enemy = gs.getEnemy(_tank);
+            _enemy = gs.GetEnemy(_tank);
             _enemyAgent = _enemy.GetComponent<TankAgent>();
 
 
@@ -46,6 +46,8 @@ namespace Tank.AI {
 
 
             AddVectorObs(normalized);
+            AddVectorObs(gs.MatchPercentageRemaining);
+
             AddVectorObs((int) _tank.state, Enum.GetValues(typeof(TankState)).Length);
             AddVectorObs(Mathf.Clamp(1 - (_tank.GetNormalizedSpecial() / _tank.special4Block), 0f, 1f));
             AddVectorObs(Mathf.Clamp(1 - (_tank.GetNormalizedSpecial() / _tank.special4Boost) * 5, 0f, 1));
@@ -72,6 +74,12 @@ namespace Tank.AI {
         }
 
         public override void AgentAction(float[] vectorAction, string textAction) {
+            if (gs.MatchPercentageRemaining <= 0) {
+                AddReward(-1f);
+                collectReward = false;
+                StartCoroutine(WaitBeforeReset(1));
+            }
+
             if (_input.simulating) {
                 int forward = Mathf.FloorToInt(vectorAction[0]);
                 int rotation = Mathf.FloorToInt(vectorAction[1]);
@@ -79,7 +87,7 @@ namespace Tank.AI {
 
                 if (forward == 1) {
                     _input.ForwardInput = 1;
-                    AddReward(.00005f);
+                    AddReward(.0005f);
                 }
 
                 if (forward == 2) _input.ForwardInput = -1;
@@ -107,16 +115,8 @@ namespace Tank.AI {
         private void NormalReward() {
             float totalReward = 0;
 
-            totalReward -= .00005f * (1 - Distance2Target());
+            totalReward -= .00005f;
 
-            if (_tank.GetNormalizedSpeed() <= .4f) {
-                totalReward -= .0002f;
-            }
-
-
-            if (_tank.GetNormalizedSpecial() <= .35f) {
-                totalReward -= .0002f;
-            }
 
             if (_tank.TooCloseFlag && _tank.MustFleeFromCollision) {
                 totalReward -= .0003f * (1 - Vector2.Distance(_tank.transform.position, _tank.lastCollisionPos) /
@@ -130,12 +130,7 @@ namespace Tank.AI {
 
             AddReward(totalReward);
             if (_tank.state == TankState.DEAD) {
-                if (GetCumulativeReward() > 0) {
-                    SetReward(-1f);
-                }
-                else {
-                    AddReward(-1f);
-                }
+                SetReward(-5f);
 
                 StartCoroutine(WaitBeforeReset(0));
 
@@ -143,14 +138,8 @@ namespace Tank.AI {
             }
 
             if (_enemy.state == TankState.DEAD) {
-                if (_enemy.MustFleeFromCollision) {
-                    if (GetCumulativeReward() < 0) {
-                        SetReward(1f);
-                    }
-                    else {
-                        AddReward(1f);
-                    }
-
+                if (_tank.TimeSinceLastCollision < 4){
+                    AddReward(1 + 5f * gs.MatchPercentageRemaining);
                     collectReward = false;
                 }
 
@@ -160,7 +149,7 @@ namespace Tank.AI {
 
         public void TackleReward(Vector3 col) {
             float totalReward = 0;
-
+            AddReward(.05f * gs.MatchPercentageRemaining);
             if (_tank.state != TankState.BOOST) return;
 
             // Is it facing the collision? 

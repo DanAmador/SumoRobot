@@ -18,18 +18,14 @@ namespace Tank {
         public TankState state;
 
 
-        public float TimeSinceLastCollision {
-            get => lastCollisionPos == _initialPos ? 0 : Time.time - _lastColTime;
-        }
+        public float TimeSinceLastCollision => lastCollisionPos == _initialPos ? 0 : Time.time - _lastColTime;
 
-        public float MaxSpecial {
-            get => MAX_SPECIAL;
-        }
+        public float MaxSpecial => MAX_SPECIAL;
 
         public bool TooCloseFlag => Vector3.Distance(lastCollisionPos, transform.position) < tooCloseLimit;
         private float CurrentSpeed { get; set; }
         private float SpecialCounter { get; set; }
-        public bool MustFleeFromCollision => TimeSinceLastCollision < 5;
+        public bool MustFleeFromCollision => TimeSinceLastCollision < 3;
 
 
         [Header("Gameplay Values"), Range(5, 20), SerializeField]
@@ -163,7 +159,7 @@ namespace Tank {
             TankController collider = collision.gameObject.GetComponent<TankController>();
             if (collider.state == TankState.BLOCK) {
                 StartCoroutine(CollisionStateHandler());
-                _rb.AddForceAtPosition(collider.transform.position, -2 * collision.impulse / Time.deltaTime);
+                _rb.AddForceAtPosition(collision.transform.position, -2 * collision.impulse / Time.deltaTime);
             }
 
             if (collider.state == TankState.BOOST) {
@@ -298,7 +294,6 @@ namespace Tank {
         private IEnumerator CollisionStateHandler() {
             state = TankState.COLLIDED;
             CurrentSpeed = START_SPEED;
-            _agent.AddReward(-.005f);
             yield return new WaitForSeconds(1);
 
             state = TankState.NORMAL;

@@ -8,7 +8,6 @@ namespace Tank {
         [SerializeField] private ParticleSystem.EmissionModule em;
         [SerializeField] private ParticleSystem ps;
         private bool active;
-
         private void Start() {
             active = true;
         }

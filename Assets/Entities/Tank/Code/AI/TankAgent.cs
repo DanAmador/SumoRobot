@@ -11,7 +11,7 @@ namespace Tank.AI {
         public GameSessionManager gs;
         private TankInputs _input;
         private RayPerception3D _rayPerception;
-        private bool _collectReward;
+        [SerializeField] private bool _collectReward;
 
         private float _rayDistance;
         private readonly float[] _rayAngles = {0f, 45f, 70f, 90f, 135f, 180f, 110f, 270};
@@ -19,7 +19,7 @@ namespace Tank.AI {
 
         public override void InitializeAgent() {
             base.InitializeAgent();
-            _tank = GetComponent<TankController>();
+            _tank = gameObject.GetComponent<TankController>();
             _input = GetComponent<TankInputs>();
 //            _input.playerControl = false;
 
@@ -43,7 +43,6 @@ namespace Tank.AI {
 
             AddVectorObs(_rayPerception.Perceive(_rayDistance, _rayAngles, _observables, 0f, 0f));
             AddVectorObs(_rayPerception.Perceive(_rayDistance / 2, _rayAngles, _observables, 0f, 0f));
-
 
             AddVectorObs(normalized);
             AddVectorObs(gs.MatchPercentageRemaining);
@@ -75,7 +74,7 @@ namespace Tank.AI {
 
         public override void AgentAction(float[] vectorAction, string textAction) {
             if (gs.MatchPercentageRemaining <= 0) {
-                AddReward(-1f);
+                AddReward(-.7f);
                 _collectReward = false;
                 StartCoroutine(WaitBeforeReset(1));
             }
@@ -85,10 +84,7 @@ namespace Tank.AI {
                 int rotation = Mathf.FloorToInt(vectorAction[1]);
                 int button = Mathf.FloorToInt(vectorAction[2]);
 
-                if (forward == 1) {
-                    _input.ForwardInput = 1;
-                    AddReward(.0005f);
-                }
+                if (forward == 1) _input.ForwardInput = 1;
 
                 if (forward == 2) _input.ForwardInput = -1;
 
@@ -98,78 +94,68 @@ namespace Tank.AI {
                 if (button == 1) _input.VirtualInputSimulate(Buttons.BLOCK, 1f);
                 if (button == 2) _input.VirtualInputSimulate(Buttons.TURBO, 1f);
                 if (button == 3) _input.VirtualInputSimulate(Buttons.DRIFT);
-
-
-                if (_collectReward) NormalReward();
             }
+
+            if (_collectReward) NormalReward();
 
 //            Vector3 vecTo = (enemy.transform.position - transform.position);
 //            Debug.Log("Reward: " + GetReward() );
-//            Debug.Log($"Cumulative: {GetCumulativeReward()}");
+//            Debug.Log($"{brain.name} cumulative: {GetCumulativeReward()}");
 //            Debug.Log(totalReward.ToString("0.##########"));
 
 
-            Monitor.Log("Reward", GetCumulativeReward(), transform);
+            Monitor.Log(brain.name, GetCumulativeReward(), gameObject.transform);
         }
 
         private void NormalReward() {
 //            Debug.Log(_tank.GetNormalizedSpecial());
             float totalReward = 0;
+//
+//            totalReward -= .00005f * (1 - _tank.GetNormalizedSpecial());
 
-            totalReward -= .00005f * (1 - _tank.GetNormalizedSpecial());
-
-
-            if (_tank.TooCloseFlag && _tank.MustFleeFromCollision) {
-                totalReward -= .0003f * (1 - Vector2.Distance(_tank.transform.position, _tank.lastCollisionPos) /
-                                         _tank.tooCloseLimit);
-            }
+//
+//            if (_tank.TooCloseFlag && _tank.MustFleeFromCollision) {
+//                totalReward -= .0003f * (1 - Vector2.Distance(_tank.transform.position, _tank.lastCollisionPos) /
+//                                         _tank.tooCloseLimit);
+//            }
 
             if (_tank.onEdge) {
-                totalReward -= .003f;
+                totalReward -= .0005f;
             }
 
 
             AddReward(totalReward);
-            if (_tank.state == TankState.DEAD) {
-                AddReward(-1 - 5f * (gs.MatchPercentageRemaining));
-
-                StartCoroutine(WaitBeforeReset(0));
-
-                _collectReward = false;
-            }
-
-            if (_enemy.state == TankState.DEAD) {
-                if (_enemy.MustFleeFromCollision) {
-                    AddReward(1 + 5f * gs.MatchPercentageRemaining);
-                    _collectReward = false;
-                }
-
-                StartCoroutine(WaitBeforeReset(0));
-            }
         }
 
         public void TackleReward(Vector3 col) {
             float totalReward = 0;
 
-            float forwardTackle = ForwardDot(col);
+            float forwardTackle = Mathf.Abs(ForwardDot(col));
 
-            if (forwardTackle < .4f) return;
 
-            AddReward(.05f * gs.MatchPercentageRemaining);
+            totalReward += .05f * gs.MatchPercentageRemaining;
 
             // Is it facing the collision? 
-
+            if (forwardTackle < .5) return;
 
             // Is it attacking the enemy from the side?
             float side = Mathf.Abs(
                 Vector3.Dot(_tank.transform.forward.normalized, _enemy.transform.right.normalized));
 
 //            side = side >= .5f ? side : .5f;
-            totalReward += side * .2f;
+            totalReward += side * .002f;
             totalReward += forwardTackle * (_tank.state == TankState.BOOST ? 1 : .1f);
-            AddReward(totalReward);
+            AddReward(Mathf.Clamp(totalReward, 0, .5f));
         }
 
+
+        public void Dead() {
+            float reward = gs.MatchPercentageRemaining;
+            AddReward(-reward);
+            _enemyAgent.AddReward(reward);
+            _collectReward = false;
+            StartCoroutine(WaitBeforeReset(2));
+        }
 
         private IEnumerator WaitBeforeReset(float time) {
             yield return new WaitForSeconds(time);

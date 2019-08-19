@@ -72,7 +72,7 @@ namespace Tank {
         #region Mono Methods
 
         void Start() {
-            _agent = GetComponent<TankAgent>();
+            _agent = gameObject.GetComponent<TankAgent>();
             _accelRatePerSec = (MAX_SPEED - START_SPEED) / timeToMaxSpeed;
             specialRatePerSec = MAX_SPECIAL / timeToMaxSpecial;
             _rb = GetComponent<Rigidbody>();
@@ -153,7 +153,7 @@ namespace Tank {
             if (!collision.gameObject.CompareTag("Player")) return;
             if (state == TankState.BLOCK) {
                 _rb.constraints = RigidbodyConstraints.FreezeAll;
-                _agent.AddReward(1);
+                _agent.AddReward(.7f);
                 return;
             }
 
@@ -199,6 +199,7 @@ namespace Tank {
 
             if (other.gameObject.CompareTag("Death")) {
                 state = TankState.DEAD;
+                _agent.Dead();
             }
         }
 

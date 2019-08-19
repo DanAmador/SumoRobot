@@ -50,18 +50,18 @@ namespace Tank {
         private Vector3 _initialPos;
         private Quaternion _initialRot;
         [SerializeField] private TankAgent _agent;
-        public float tooCloseLimit = 20;
+        public float tooCloseLimit = 12;
 
         #region Getters
 
         public float GetNormalizedSpeed() {
             if (state == TankState.BLOCK) return 0;
 
-            return (CurrentSpeed - START_SPEED) / (MAX_SPEED - START_SPEED);
+            return Mathf.Clamp((CurrentSpeed - START_SPEED) / (MAX_SPEED - START_SPEED), 0, MAX_SPEED);
         }
 
         public float GetNormalizedSpecial() {
-            return SpecialCounter / MAX_SPECIAL;
+            return Mathf.Clamp(SpecialCounter / MAX_SPECIAL, 0, MAX_SPECIAL);
         }
 
         #endregion
@@ -80,8 +80,9 @@ namespace Tank {
             _input = GetComponent<TankInputs>();
             CurrentSpeed = START_SPEED;
             state = TankState.NORMAL;
-            _initialPos = transform.position;
-            _initialRot = transform.rotation;
+            var transform1 = transform;
+            _initialPos = transform1.position;
+            _initialRot = transform1.rotation;
         }
 
 
@@ -168,7 +169,7 @@ namespace Tank {
             }
 
 
-            if (!TooCloseFlag || !MustFleeFromCollision) {
+            if ((!TooCloseFlag || !MustFleeFromCollision) && GetNormalizedSpeed() > .6f) {
                 var position = collision.transform.position;
                 _agent.TackleReward(position);
                 lastCollisionPos = position;
@@ -280,7 +281,8 @@ namespace Tank {
         private IEnumerator TurboBoost(float currentSpecial) {
             state = TankState.BOOST;
             float oldSpeed = CurrentSpeed;
-            CurrentSpeed =  Mathf.Clamp(CurrentSpeed + CurrentSpeed *GetNormalizedSpecial()*2, CurrentSpeed, MAX_SPEED*1.5f);
+            CurrentSpeed = Mathf.Clamp(CurrentSpeed + CurrentSpeed * GetNormalizedSpecial() * 2, CurrentSpeed,
+                MAX_SPEED * 1.5f);
             yield return new WaitForSeconds(1);
 
             SpecialCounter = 0;

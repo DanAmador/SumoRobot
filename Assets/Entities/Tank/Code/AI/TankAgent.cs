@@ -50,7 +50,7 @@ namespace Tank.AI {
 
             AddVectorObs((int) _tank.state, Enum.GetValues(typeof(TankState)).Length);
             AddVectorObs(Mathf.Clamp(1 - (_tank.GetNormalizedSpecial() / _tank.special4Block), 0f, 1f));
-            AddVectorObs(Mathf.Clamp(1 - (_tank.GetNormalizedSpecial() / _tank.special4Boost) * 5, 0f, 1));
+            AddVectorObs(Mathf.Clamp(1 - (_tank.GetNormalizedSpecial() / (_tank.special4Boost * 5)), 0f, 1));
 
             AddVectorObs(Mathf.Abs(ForwardDot()));
             AddVectorObs(_tank.MaxSpecial);
@@ -113,9 +113,10 @@ namespace Tank.AI {
         }
 
         private void NormalReward() {
+//            Debug.Log(_tank.GetNormalizedSpecial());
             float totalReward = 0;
 
-            totalReward -= .00005f * (1 - _tank.GetNormalizedSpecial() );
+            totalReward -= .00005f * (1 - _tank.GetNormalizedSpecial());
 
 
             if (_tank.TooCloseFlag && _tank.MustFleeFromCollision) {
@@ -138,7 +139,7 @@ namespace Tank.AI {
             }
 
             if (_enemy.state == TankState.DEAD) {
-                if (_tank.TimeSinceLastCollision < 4){
+                if (_tank.TimeSinceLastCollision < 4) {
                     AddReward(1 + 5f * gs.MatchPercentageRemaining);
                     _collectReward = false;
                 }
@@ -149,11 +150,14 @@ namespace Tank.AI {
 
         public void TackleReward(Vector3 col) {
             float totalReward = 0;
+
+            float forwardTackle = ForwardDot(col);
+
+            if (forwardTackle < .4f) return;
+
             AddReward(.05f * gs.MatchPercentageRemaining);
-            if (_tank.state != TankState.BOOST) return;
 
             // Is it facing the collision? 
-            float forwardTackle = ForwardDot(col);
 
 
             // Is it attacking the enemy from the side?
@@ -161,7 +165,7 @@ namespace Tank.AI {
                 Vector3.Dot(_tank.transform.forward.normalized, _enemy.transform.right.normalized));
 
             side = side >= .5f ? side : .5f;
-            totalReward += forwardTackle * side;
+            totalReward += forwardTackle * side * (_tank.state == TankState.BOOST ? 1 : .1f);
             AddReward(totalReward);
         }
 
@@ -191,8 +195,7 @@ namespace Tank.AI {
         private float ForwardDot(Vector3 c) {
             var transform1 = _tank.transform;
             Vector3 toCheck = c == Vector3.zero ? _enemy.transform.position : c;
-            return Mathf.Abs(Vector3.Dot(transform1.forward,
-                (toCheck - transform1.position).normalized));
+            return Vector3.Dot(transform1.forward, (toCheck - transform1.position).normalized);
         }
     }
 }

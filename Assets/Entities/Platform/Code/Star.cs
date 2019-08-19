@@ -1,50 +1,72 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Platform {
     public class Star : MonoBehaviour {
-        private Vector3 _direction,_lookDirection;
+        private Vector3 _direction, _lookDirection;
         private float _speed;
-        [SerializeField] private HashSet<Star> directNeighbors;
+        public List<LineRenderer> lines;
+        public List<Star> _directNeighbors;
+        public LineRenderer lineRendererPrefab;
+
         void Awake() {
-            directNeighbors = new HashSet<Star>();
             _speed = Random.Range(0.01f, .05f);
             _direction = Random.onUnitSphere;
             _lookDirection = Random.onUnitSphere * Random.Range(0,30);
         }
 
         void Update() {
-            if (directNeighbors == null)
-                directNeighbors = new HashSet<Star>(); //I have no fucking clue why it wasn't being initialized...
-            if (transform.position.y < -2) {
-                _direction *= -1;
-            }
+//            if (transform.position.y < 20) {
+//                _direction *= -1;
+//            }
+//            transform.LookAt(transform.parent.position + Random.onUnitSphere );
 
             transform.RotateAround(transform.parent.position, _direction, _speed);
-            transform.LookAt(transform.parent.position + Random.onUnitSphere * Mathf.Sin(Time.deltaTime));
 //            transform.Rotate(_direction, _speed * Time.deltaTime);
 
-            foreach (Star neighbor in directNeighbors) {
-                Debug.DrawLine(neighbor.transform.position, transform.position, Color.yellow);
+
+            for (int i = 0; i < Mathf.Min(lines.Count, _directNeighbors.Count); i++) {
+                LineRenderer line = lines[i];
+                Star s = _directNeighbors[i];
+
+                line.SetPosition(0, Vector3.zero);
+                line.SetPosition(1, s.transform.position - transform.position);
             }
+//            foreach (Star neighbor in directNeighbors) {
+
+//                Debug.DrawLine(neighbor.transform.position, transform.position, Color.yellow);
         }
 
 
         private void OnTriggerEnter(Collider other) {
-            if (directNeighbors != null && other.gameObject.CompareTag("Star")) {
+            if (_directNeighbors != null && other.gameObject.CompareTag("Star")) {
                 Star stother = other.gameObject.GetComponent<Star>();
-                if (!stother.HasDirectNeighor(this)) directNeighbors.Add(stother);
+                if (!stother.HasDirectNeighor(this)) {
+                    var lineRenderer = Instantiate(lineRendererPrefab, transform);
+                    lineRenderer.transform.SetParent(transform);
+                    lines.Add(lineRenderer);
+
+                    _directNeighbors.Add(stother);
+                }
             }
         }
 
         private void OnTriggerExit(Collider other) {
-            directNeighbors.Remove(other.gameObject.GetComponent<Star>());
+            if (lines.Count != 0 ) {
+                var last = lines.Last();
+                lines.Remove(last);
+                Destroy(last);    
+                _directNeighbors.Remove(other.gameObject.GetComponent<Star>());
+
+            }
+            
         }
 
-        public bool HasDirectNeighor(Star star) {
-            return directNeighbors.Contains(star);
+        private bool HasDirectNeighor(Star star) {
+            return _directNeighbors.Contains(star);
         }
     }
 }

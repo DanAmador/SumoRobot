@@ -14,7 +14,7 @@ namespace Platform {
 
             for (int i = 0; i < amountOfStars; i++) {
                 Vector3 spawnPos = Random.onUnitSphere * radius;
-                spawnPos.y = Mathf.Abs(spawnPos.y);
+//                spawnPos.y = Mathf.Abs(spawnPos.y);
                 GameObject st = Instantiate(starObject, spawnPos, Quaternion.identity);
                 st.transform.parent = transform;
                 Star star = st.GetComponent<Star>();

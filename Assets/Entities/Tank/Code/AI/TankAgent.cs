@@ -152,7 +152,7 @@ namespace Tank.AI {
         public void Dead() {
             float reward = gs.MatchPercentageRemaining;
             AddReward(-reward);
-            _enemyAgent.AddReward(reward);
+//            _enemyAgent.AddReward(reward);
             _collectReward = false;
             StartCoroutine(WaitBeforeReset(2));
         }

@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: a07fadb24ea940240afba3afc1a692cc, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -402,7 +402,17 @@ PrefabInstance:
     - target: {fileID: 8155771733415576578, guid: 64c4aa7ceaddc59448b07d62d8a05953,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8155771733415576578, guid: 64c4aa7ceaddc59448b07d62d8a05953,
+        type: 3}
+      propertyPath: amountOfStars
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 8155771733415576578, guid: 64c4aa7ceaddc59448b07d62d8a05953,
+        type: 3}
+      propertyPath: radius
+      value: 70
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 64c4aa7ceaddc59448b07d62d8a05953, type: 3}
@@ -446,7 +456,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &978747620
 Light:
   m_ObjectHideFlags: 0
@@ -457,7 +467,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 9
   m_Type: 1
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.9386792, b: 0.9386792, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
@@ -514,13 +524,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 978747619}
-  m_LocalRotation: {x: 0.46168363, y: -0.22734046, z: 0.12370775, w: 0.84844625}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalRotation: {x: 0.47781554, y: -0.41970423, z: 0.012153095, w: 0.7716172}
+  m_LocalPosition: {x: 12.3, y: 29.9, z: -21.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 57.106003, y: -30.000002, z: 0}
+  m_LocalEulerAnglesHint: {x: 48.381, y: -73.28001, z: -35.145}
 --- !u!1 &1169435221
 GameObject:
   m_ObjectHideFlags: 0
@@ -557,6 +567,8 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 847edc46f95757d429a75731f33479ab, type: 2}
     _brainsToControl:
     - {fileID: 0}
+    - {fileID: 11400000, guid: c5e7319704b40b545af559a0e0d7a0e3, type: 2}
+    - {fileID: 11400000, guid: 847edc46f95757d429a75731f33479ab, type: 2}
   maxSteps: 10000
   trainingConfiguration:
     width: 80

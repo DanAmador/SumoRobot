@@ -22,5 +22,5 @@ MonoBehaviour:
     - Rotation
     - Buttons
     vectorActionSpaceType: 0
-  model: {fileID: 350466407230261852, guid: 0572d0fc598552847a0afafedf92b85b, type: 3}
+  model: {fileID: -6785226784583654059, guid: 757603e62239ce44aba831e6a7d27707, type: 3}
   inferenceDevice: 0

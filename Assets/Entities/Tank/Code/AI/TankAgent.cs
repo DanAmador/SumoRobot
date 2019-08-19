@@ -125,13 +125,13 @@ namespace Tank.AI {
             }
 
             if (_tank.onEdge) {
-                totalReward -= .0003f;
+                totalReward -= .003f;
             }
 
 
             AddReward(totalReward);
             if (_tank.state == TankState.DEAD) {
-                SetReward(-5f);
+                AddReward(-1 - 5f * (gs.MatchPercentageRemaining));
 
                 StartCoroutine(WaitBeforeReset(0));
 
@@ -139,7 +139,7 @@ namespace Tank.AI {
             }
 
             if (_enemy.state == TankState.DEAD) {
-                if (_tank.TimeSinceLastCollision < 4) {
+                if (_enemy.MustFleeFromCollision) {
                     AddReward(1 + 5f * gs.MatchPercentageRemaining);
                     _collectReward = false;
                 }
@@ -164,8 +164,9 @@ namespace Tank.AI {
             float side = Mathf.Abs(
                 Vector3.Dot(_tank.transform.forward.normalized, _enemy.transform.right.normalized));
 
-            side = side >= .5f ? side : .5f;
-            totalReward += forwardTackle * side * (_tank.state == TankState.BOOST ? 1 : .1f);
+//            side = side >= .5f ? side : .5f;
+            totalReward += side * .2f;
+            totalReward += forwardTackle * (_tank.state == TankState.BOOST ? 1 : .1f);
             AddReward(totalReward);
         }
 

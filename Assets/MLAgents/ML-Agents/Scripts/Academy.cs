@@ -345,14 +345,14 @@ namespace MLAgents
                 var pythonParameters = brainBatcher.SendAcademyParameters(academyParameters);
                 Random.InitState(pythonParameters.Seed);
                 Application.logMessageReceived += HandleLog;
-                logPath = Path.GetFullPath(".") + "/UnitySDK.log";
-                using (var fs = File.Open(logPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
-                {
-                    logWriter = new StreamWriter(fs);
-                    logWriter.WriteLine(System.DateTime.Now.ToString());
-                    logWriter.WriteLine(" ");
-                    logWriter.Close();
-                }
+//                logPath = Path.GetFullPath(".") + "/UnitySDK.log";
+//                using (var fs = File.Open(logPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite))
+//                {
+//                    logWriter = new StreamWriter(fs);
+//                    logWriter.WriteLine(System.DateTime.Now.ToString());
+//                    logWriter.WriteLine(" ");
+//                    logWriter.Close();
+//                }
             }
 
             // If a communicator is enabled/provided, then we assume we are in

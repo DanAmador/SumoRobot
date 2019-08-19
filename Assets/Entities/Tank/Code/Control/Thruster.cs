@@ -7,9 +7,12 @@ namespace Tank {
         public float strength, distance;
         [SerializeField] private ParticleSystem.EmissionModule em;
         [SerializeField] private ParticleSystem ps;
+        private int layer_mask;
         private bool active;
+
         private void Start() {
             active = true;
+            layer_mask = LayerMask.GetMask("Player", "Platform");
         }
 
         public void Thrust() {
@@ -19,13 +22,13 @@ namespace Tank {
             Vector3 downwardForce;
             Debug.DrawRay(transform.position, transform.up * -distance, Color.yellow);
 
-            if (!Physics.Raycast(transform.position, transform.up * -1, out hit, distance)) {
+            if (!Physics.Raycast(transform.position, transform.up * -1, out hit, distance, layer_mask)) {
                 if (ps.isPlaying) ps.Stop();
                 return;
             }
 
             if (!hit.collider.gameObject.CompareTag("Platform")) return;
-        
+
             if (!ps.isPlaying) ps.Play();
             distancePercentage = 1 - (hit.distance / distance);
             downwardForce = strength * distancePercentage * transform.up;
@@ -37,6 +40,7 @@ namespace Tank {
         public void OnOff() {
             active = !active;
         }
+
         public void InitValues(float strength, float distance, Rigidbody rb, ParticleSystem ps) {
             if (this.rb) return;
 

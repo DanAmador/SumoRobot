@@ -11,11 +11,11 @@ namespace Tank.AI {
         public GameSessionManager gs;
         private TankInputs _input;
         private RayPerception3D _rayPerception;
-        private bool collectReward;
+        private bool _collectReward;
 
-        private float rayDistance;
-        private readonly float[] rayAngles = {0f, 45f, 70f, 90f, 135f, 180f, 110f, 270};
-        private readonly String[] observables = {"Edge", "Player"};
+        private float _rayDistance;
+        private readonly float[] _rayAngles = {0f, 45f, 70f, 90f, 135f, 180f, 110f, 270};
+        private readonly string[] _observables = {"Edge", "Player"};
 
         public override void InitializeAgent() {
             base.InitializeAgent();
@@ -23,13 +23,13 @@ namespace Tank.AI {
             _input = GetComponent<TankInputs>();
 //            _input.playerControl = false;
 
-            rayDistance = _tank.tooCloseLimit * 2;
+            _rayDistance = _tank.tooCloseLimit * 2;
             _enemy = gs.GetEnemy(_tank);
             _enemyAgent = _enemy.GetComponent<TankAgent>();
 
 
             _rayPerception = GetComponent<RayPerception3D>();
-            collectReward = true;
+            _collectReward = true;
         }
 
         public override void CollectObservations() {
@@ -41,8 +41,8 @@ namespace Tank.AI {
             Vector3 normalized = tankTransform.rotation.eulerAngles / 360.0f; // [0,1]
 
 
-            AddVectorObs(_rayPerception.Perceive(rayDistance, rayAngles, observables, 0f, 0f));
-            AddVectorObs(_rayPerception.Perceive(rayDistance / 2, rayAngles, observables, 0f, 0f));
+            AddVectorObs(_rayPerception.Perceive(_rayDistance, _rayAngles, _observables, 0f, 0f));
+            AddVectorObs(_rayPerception.Perceive(_rayDistance / 2, _rayAngles, _observables, 0f, 0f));
 
 
             AddVectorObs(normalized);
@@ -76,7 +76,7 @@ namespace Tank.AI {
         public override void AgentAction(float[] vectorAction, string textAction) {
             if (gs.MatchPercentageRemaining <= 0) {
                 AddReward(-1f);
-                collectReward = false;
+                _collectReward = false;
                 StartCoroutine(WaitBeforeReset(1));
             }
 
@@ -100,7 +100,7 @@ namespace Tank.AI {
                 if (button == 3) _input.VirtualInputSimulate(Buttons.DRIFT);
 
 
-                if (collectReward) NormalReward();
+                if (_collectReward) NormalReward();
             }
 
 //            Vector3 vecTo = (enemy.transform.position - transform.position);
@@ -115,7 +115,7 @@ namespace Tank.AI {
         private void NormalReward() {
             float totalReward = 0;
 
-            totalReward -= .00005f;
+            totalReward -= .00005f * (1 - _tank.GetNormalizedSpecial() );
 
 
             if (_tank.TooCloseFlag && _tank.MustFleeFromCollision) {
@@ -134,13 +134,13 @@ namespace Tank.AI {
 
                 StartCoroutine(WaitBeforeReset(0));
 
-                collectReward = false;
+                _collectReward = false;
             }
 
             if (_enemy.state == TankState.DEAD) {
                 if (_tank.TimeSinceLastCollision < 4){
                     AddReward(1 + 5f * gs.MatchPercentageRemaining);
-                    collectReward = false;
+                    _collectReward = false;
                 }
 
                 StartCoroutine(WaitBeforeReset(0));
@@ -175,7 +175,7 @@ namespace Tank.AI {
 
         public override void AgentReset() {
             gs.Reset();
-            collectReward = true;
+            _collectReward = true;
         }
 
 

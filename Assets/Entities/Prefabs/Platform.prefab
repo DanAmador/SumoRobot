@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1658306661}
   - component: {fileID: 6714630655843511118}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Bounds
   m_TagString: Edge
   m_Icon: {fileID: 0}
@@ -54,7 +54,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3074429892083384826}
   - component: {fileID: 6955569676897678701}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Bounds (5)
   m_TagString: Edge
   m_Icon: {fileID: 0}
@@ -98,7 +98,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1352714352997043233}
   - component: {fileID: 2722183634534256794}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Bounds (6)
   m_TagString: Edge
   m_Icon: {fileID: 0}
@@ -142,7 +142,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2547621208581968587}
   - component: {fileID: 8113145535134108545}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Bounds (3)
   m_TagString: Edge
   m_Icon: {fileID: 0}
@@ -185,7 +185,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8497987061642941588}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Bounds
   m_TagString: Edge
   m_Icon: {fileID: 0}
@@ -224,7 +224,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8292376593708118773}
   - component: {fileID: 2293808492026208469}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Bounds (2)
   m_TagString: Edge
   m_Icon: {fileID: 0}
@@ -267,6 +267,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8123455157296611820}
+  - component: {fileID: 8155771733415576578}
+  - component: {fileID: 3161782453863533811}
   m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
@@ -282,7 +284,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8123455157296611816}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 396890367924965742}
@@ -291,6 +293,38 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8155771733415576578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8123455157296611816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4306aa142548ed448464620b1b15120, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  amountOfStars: 50
+  starObject: {fileID: 601487565145170106, guid: 005274faa984e46469c6e313c77b9e1f,
+    type: 3}
+  radius: 100
+--- !u!114 &3161782453863533811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8123455157296611816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be766951907225249b19ab29b0352142, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  xAmplitude: 0
+  zAmplitude: 0
+  xRotation: 1
+  zRotation: 1
 --- !u!1 &8369642444736455920
 GameObject:
   m_ObjectHideFlags: 0
@@ -301,7 +335,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4801175057704604560}
   - component: {fileID: 4115226704255606997}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Bounds (4)
   m_TagString: Edge
   m_Icon: {fileID: 0}
@@ -345,11 +379,10 @@ GameObject:
   m_Component:
   - component: {fileID: 396890367924965742}
   - component: {fileID: 4001423529075621780}
-  - component: {fileID: 2742594755384796607}
   - component: {fileID: 3368371937030615187}
   - component: {fileID: 4645562260467167410}
-  m_Layer: 0
-  m_Name: Platform
+  m_Layer: 11
+  m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -383,22 +416,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 14
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &2742594755384796607
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8515526132514656395}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be766951907225249b19ab29b0352142, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  xAmplitude: 0.346
-  zAmplitude: 0
-  xRotation: 1
-  zRotation: 1
 --- !u!33 &3368371937030615187
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -455,7 +472,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2979752988308827967}
   - component: {fileID: 9006998993882163480}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Bounds (7)
   m_TagString: Edge
   m_Icon: {fileID: 0}
@@ -500,7 +517,7 @@ GameObject:
   - component: {fileID: 6463163434178113785}
   - component: {fileID: 2020873281850347044}
   - component: {fileID: 1734726851}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Plane
   m_TagString: Death
   m_Icon: {fileID: 0}
@@ -552,7 +569,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3756078654711714355}
   - component: {fileID: 6477347500952071272}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Bounds (1)
   m_TagString: Edge
   m_Icon: {fileID: 0}

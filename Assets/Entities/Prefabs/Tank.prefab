@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 46969057}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Thrusters
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -43,7 +43,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 186549536}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Thruster (2)
   m_TagString: Untagged
   m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
@@ -75,7 +75,7 @@ GameObject:
   - component: {fileID: 963194228}
   - component: {fileID: 963194227}
   - component: {fileID: 264753364}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: TrackCamera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -164,7 +164,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1042684519}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Thruster (3)
   m_TagString: Untagged
   m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
@@ -195,7 +195,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1090943506}
   - component: {fileID: 1090943507}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: ThrusterBack
   m_TagString: Untagged
   m_Icon: {fileID: -1412012063857583412, guid: 0000000000000000d000000000000000, type: 0}
@@ -330,7 +330,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1128865589}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Thruster (1)
   m_TagString: Untagged
   m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
@@ -360,7 +360,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1129536735}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Thruster
   m_TagString: Untagged
   m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
@@ -390,7 +390,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1269594932}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: BackThruster
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -424,7 +424,7 @@ GameObject:
   - component: {fileID: 1415079489}
   - component: {fileID: 1415079488}
   - component: {fileID: 1415079487}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -501,7 +501,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2140948487}
   - component: {fileID: 2140948488}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: ThrusterBack (1)
   m_TagString: Untagged
   m_Icon: {fileID: -1412012063857583412, guid: 0000000000000000d000000000000000, type: 0}
@@ -638,7 +638,7 @@ GameObject:
   - component: {fileID: 7178035256419854738}
   - component: {fileID: 7730096334526411400}
   - component: {fileID: 2154026972231229449}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -715,7 +715,7 @@ GameObject:
   - component: {fileID: 1051778092647782057}
   - component: {fileID: 2396060181471979418}
   - component: {fileID: 189107586956000509}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -829,7 +829,7 @@ GameObject:
   - component: {fileID: 7212209648485416277}
   - component: {fileID: 836042352340674364}
   - component: {fileID: 6333389967854551970}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Special
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -904,7 +904,7 @@ GameObject:
   - component: {fileID: 4875126507933394705}
   - component: {fileID: 2735219927752010279}
   - component: {fileID: 278790502786987722}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -988,7 +988,7 @@ GameObject:
   - component: {fileID: 68585724}
   - component: {fileID: 1461478629}
   - component: {fileID: 400973491}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Tank
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -1166,7 +1166,7 @@ GameObject:
   - component: {fileID: 69516196581365875}
   - component: {fileID: 6685331742045581492}
   - component: {fileID: 4413540247076618595}
-  m_Layer: 8
+  m_Layer: 10
   m_Name: Speed
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -37,7 +37,7 @@ namespace MLAgents
                 if (Application.isEditor)
                 {
                     Debug.DrawRay(transform.position + new Vector3(0f, startOffset, 0f),
-                        endPosition, Color.black, 0.01f, true);
+                        endPosition, Color.yellow, 0.01f, true);
                 }
 
                 float[] subList = new float[detectableObjects.Length + 2];

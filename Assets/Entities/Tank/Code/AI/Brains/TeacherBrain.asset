@@ -13,15 +13,17 @@ MonoBehaviour:
   m_Name: TeacherBrain
   m_EditorClassIdentifier: 
   brainParameters:
-    vectorObservationSize: 97
+    vectorObservationSize: 79
     numStackedVectorObservations: 1
-    vectorActionSize: 030000000300000004000000
+    vectorActionSize: 05000000
     cameraResolutions: []
     vectorActionDescriptions:
     - Forward
     - Rotation
-    - Buttons
-    vectorActionSpaceType: 0
+    - Block
+    - Turbo
+    - Drift
+    vectorActionSpaceType: 1
   keyContinuousPlayerActions: []
   axisContinuousPlayerActions: []
   discretePlayerActions:

@@ -8,7 +8,7 @@ namespace GameSession {
         [SerializeField] private TankController[] tanks;
         private PlatformMover _platform;
         private float _matchStart;
-        public float roundDuration = 30; // in seconds 
+        public float roundDuration = 45; // in seconds 
 
         public float MatchPercentageRemaining => 1 - (Time.time - _matchStart) / roundDuration;
 

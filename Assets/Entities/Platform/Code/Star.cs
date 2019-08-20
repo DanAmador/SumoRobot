@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -13,7 +12,7 @@ namespace Platform {
         public LineRenderer lineRendererPrefab;
 
         void Awake() {
-            _speed = Random.Range(0.01f, .05f);
+            _speed = Random.Range(0.01f, .01f);
             _direction = Random.onUnitSphere;
             _lookDirection = Random.onUnitSphere * Random.Range(0,30);
         }

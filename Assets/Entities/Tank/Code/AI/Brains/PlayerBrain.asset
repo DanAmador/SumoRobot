@@ -13,14 +13,16 @@ MonoBehaviour:
   m_Name: PlayerBrain
   m_EditorClassIdentifier: 
   brainParameters:
-    vectorObservationSize: 97
+    vectorObservationSize: 79
     numStackedVectorObservations: 1
-    vectorActionSize: 030000000300000004000000
+    vectorActionSize: 05000000
     cameraResolutions: []
     vectorActionDescriptions:
     - Forward
     - Rotation
-    - Buttons
-    vectorActionSpaceType: 0
+    - Block
+    - Turbo
+    - Drift
+    vectorActionSpaceType: 1
   model: {fileID: -6785226784583654059, guid: 757603e62239ce44aba831e6a7d27707, type: 3}
   inferenceDevice: 0

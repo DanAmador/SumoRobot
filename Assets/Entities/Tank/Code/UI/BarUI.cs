@@ -13,7 +13,7 @@ namespace Tank.UI {
 
         void Update() {
             special.fillAmount = _tank.GetNormalizedSpecial();
-            speed.fillAmount = _tank.GetNormalizedSpeed();
+            speed.fillAmount = Mathf.Abs(_tank.GetNormalizedSpeed());
         }
     }
 }

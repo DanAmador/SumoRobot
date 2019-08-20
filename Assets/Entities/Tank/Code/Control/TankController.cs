@@ -18,14 +18,15 @@ namespace Tank {
         public TankState state;
 
 
-        public float TimeSinceLastCollision => lastCollisionPos == _initialPos ? 0 : Time.time - _lastColTime;
-
         public float MaxSpecial => MAX_SPECIAL;
 
-        public bool TooCloseFlag => Vector3.Distance(lastCollisionPos, transform.position) < tooCloseLimit;
         private float CurrentSpeed { get; set; }
         private float SpecialCounter { get; set; }
-        public bool MustFleeFromCollision => TimeSinceLastCollision < 3;
+
+        private float TimeSinceLastCollision => lastCollisionPos == _initialPos ? 0 : Time.time - _lastColTime;
+
+        private bool MustFleeFromCollision => TimeSinceLastCollision < 3;
+        private bool TooCloseFlag => Vector3.Distance(lastCollisionPos, transform.position) < tooCloseLimit;
 
 
         [Header("Gameplay Values"), Range(5, 20), SerializeField]
@@ -37,7 +38,7 @@ namespace Tank {
         [Range(1, 5), SerializeField] private float timeToMaxSpeed = 2.5f;
         [Range(4, 10), SerializeField] private float timeToMaxSpecial = 5f;
         [Range(0, 1)] public float special4Block = 0.4f;
-        [Range(0, 1)] public float special4Boost = 0.1f;
+        [Range(0, 1)] public float special4Boost = 0.2f;
 
         private float _rotationVelocity, _groundAngleVelocity, _accelRatePerSec, _lastColTime, specialRatePerSec;
 
@@ -50,7 +51,7 @@ namespace Tank {
         private Vector3 _initialPos;
         private Quaternion _initialRot;
         [SerializeField] private TankAgent _agent;
-        public float tooCloseLimit = 12;
+        public float tooCloseLimit = 15;
 
         #region Getters
 
@@ -169,7 +170,7 @@ namespace Tank {
             }
 
 
-            if ((!TooCloseFlag || !MustFleeFromCollision) && GetNormalizedSpeed() > .6f) {
+            if (!TooCloseFlag || !MustFleeFromCollision) {
                 var position = collision.transform.position;
                 _agent.TackleReward(position);
                 lastCollisionPos = position;
@@ -286,7 +287,7 @@ namespace Tank {
                 MAX_SPEED * 1.5f);
             yield return new WaitForSeconds(1);
 
-            SpecialCounter = 0;
+            SpecialCounter = Mathf.Clamp(SpecialCounter - MAX_SPECIAL * special4Boost, 0, MAX_SPECIAL);
             CurrentSpeed = oldSpeed;
 
             yield return new WaitForSeconds(.5f);

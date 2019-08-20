@@ -113,13 +113,13 @@ namespace Tank.AI {
 //            Debug.Log(_tank.GetNormalizedSpecial());
             float totalReward = 0;
 //            
-            totalReward += .00005f * _tank.GetNormalizedSpeed();
+            totalReward += .0005f * _tank.GetNormalizedSpeed();
 
-//
-//            if (_tank.TooCloseFlag && _tank.MustFleeFromCollision) {
-//                totalReward -= .0003f * (1 - Vector2.Distance(_tank.transform.position, _tank.lastCollisionPos) /
-//                                         _tank.tooCloseLimit);
-//            }
+
+            if (_tank.TooCloseFlag && _tank.MustFleeFromCollision) {
+                totalReward -= .0003f * (1 - Vector2.Distance(_tank.transform.position, _tank.lastCollisionPos) /
+                                         _tank.tooCloseLimit);
+            }
 
             if (_tank.onEdge) {
                 totalReward -= .0005f;

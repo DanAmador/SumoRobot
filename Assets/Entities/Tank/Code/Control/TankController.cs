@@ -28,8 +28,8 @@ namespace Tank {
 
         private float TimeSinceLastCollision => lastCollisionPos == _initialPos ? 0 : Time.time - _lastColTime;
 
-        private bool MustFleeFromCollision => TimeSinceLastCollision < 3;
-        private bool TooCloseFlag => Vector3.Distance(lastCollisionPos, transform.position) < tooCloseLimit;
+        public bool MustFleeFromCollision => TimeSinceLastCollision < 3;
+        public bool TooCloseFlag => Vector3.Distance(lastCollisionPos, transform.position) < tooCloseLimit;
 
 
         [Range(800, 3000), SerializeField] private float MAX_SPEED = 2000;

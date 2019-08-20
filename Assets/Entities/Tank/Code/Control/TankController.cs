@@ -18,7 +18,10 @@ namespace Tank {
         public TankState state;
 
 
-        public float MaxSpecial => MAX_SPECIAL;
+        [field: Header("Gameplay Values")]
+        [field: Range(5, 20)]
+        [field: SerializeField]
+        public float MAX_SPECIAL { get; } = 15;
 
         private float CurrentSpeed { get; set; }
         private float SpecialCounter { get; set; }
@@ -29,14 +32,10 @@ namespace Tank {
         private bool TooCloseFlag => Vector3.Distance(lastCollisionPos, transform.position) < tooCloseLimit;
 
 
-        [Header("Gameplay Values"), Range(5, 20), SerializeField]
-        private float MAX_SPECIAL = 15;
-
-
         [Range(800, 3000), SerializeField] private float MAX_SPEED = 2000;
         [Range(150, 500), SerializeField] private float START_SPEED = 300;
         [Range(1, 5), SerializeField] private float timeToMaxSpeed = 2.5f;
-        [Range(4, 10), SerializeField] private float timeToMaxSpecial = 5f;
+        [Range(4, 10), SerializeField] private float timeToMAX_SPECIAL = 5f;
         [Range(0, 1)] public float special4Block = 0.4f;
         [Range(0, 1)] public float special4Boost = 0.2f;
 
@@ -45,7 +44,7 @@ namespace Tank {
         [Header("Internal variables")] public bool onEdge;
 
         [NonSerialized] public Vector3 lastCollisionPos;
-        [NonSerialized] public TankInputs _input;
+        [NonSerialized] private TankInputs _input;
         private Rigidbody _rb;
         private ThrusterManager _tm;
         private Vector3 _initialPos;
@@ -75,7 +74,7 @@ namespace Tank {
         void Start() {
             _agent = gameObject.GetComponent<TankAgent>();
             _accelRatePerSec = (MAX_SPEED - START_SPEED) / timeToMaxSpeed;
-            specialRatePerSec = MAX_SPECIAL / timeToMaxSpecial;
+            specialRatePerSec = MAX_SPECIAL/ timeToMAX_SPECIAL;
             _rb = GetComponent<Rigidbody>();
             _tm = GetComponent<ThrusterManager>();
             _input = GetComponent<TankInputs>();
@@ -122,7 +121,7 @@ namespace Tank {
 
                 if (_input.Turbo) {
                     if (SpecialCounter > MAX_SPECIAL * special4Boost) {
-                        StartCoroutine(TurboBoost(SpecialCounter));
+                        StartCoroutine(TurboBoost());
                     }
                 }
 
@@ -265,7 +264,8 @@ namespace Tank {
 
         private IEnumerator BlockRoutine() {
             state = TankState.BLOCK;
-
+            SpecialCounter -= Mathf.Clamp(MAX_SPECIAL * .3f, 0 , MAX_SPECIAL);
+            
             yield return new WaitUntil(BlockPredicate);
 
             state = TankState.NORMAL;
@@ -280,7 +280,7 @@ namespace Tank {
             return !_input.Block || SpecialCounter <= 0;
         }
 
-        private IEnumerator TurboBoost(float currentSpecial) {
+        private IEnumerator TurboBoost() {
             state = TankState.BOOST;
             float oldSpeed = CurrentSpeed;
             CurrentSpeed = Mathf.Clamp(CurrentSpeed + CurrentSpeed * GetNormalizedSpecial() * 2, CurrentSpeed,

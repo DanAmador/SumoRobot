@@ -136,7 +136,7 @@ PrefabInstance:
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.3999999
+      value: 1.1
       objectReference: {fileID: 0}
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
@@ -146,7 +146,7 @@ PrefabInstance:
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -21.1
+      value: -10.4
       objectReference: {fileID: 0}
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
@@ -188,6 +188,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2035671393, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: playerControl
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2035671393, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: simulating
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 956303407, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
       propertyPath: gs
       value: 
@@ -197,6 +205,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 847edc46f95757d429a75731f33479ab,
         type: 2}
+    - target: {fileID: 1090943507, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: m_Emitting
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6429914127980834922, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
       propertyPath: m_Intensity
@@ -673,6 +685,8 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 847edc46f95757d429a75731f33479ab, type: 2}
     _brainsToControl:
     - {fileID: 0}
+    - {fileID: 11400000, guid: 847edc46f95757d429a75731f33479ab, type: 2}
+    - {fileID: 11400000, guid: c5e7319704b40b545af559a0e0d7a0e3, type: 2}
   maxSteps: 10000
   trainingConfiguration:
     width: 80
@@ -728,7 +742,7 @@ PrefabInstance:
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.3
+      value: 1.1
       objectReference: {fileID: 0}
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
@@ -738,7 +752,7 @@ PrefabInstance:
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 24.6
+      value: 15.5
       objectReference: {fileID: 0}
     - target: {fileID: 7202223383700237939, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
@@ -850,6 +864,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 54333a752c6964d409e37320ac487fde, type: 2}
+    - target: {fileID: 1090943507, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: m_Emitting
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2140948488, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 

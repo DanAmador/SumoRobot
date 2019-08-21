@@ -57,11 +57,11 @@ namespace Tank {
         public float GetNormalizedSpeed() {
             if (state == TankState.BLOCK) return 0;
 
-            return Mathf.Clamp((CurrentSpeed - START_SPEED) / (MAX_SPEED - START_SPEED), 0, MAX_SPEED);
+            return Mathf.Clamp01((CurrentSpeed - START_SPEED) / (MAX_SPEED - START_SPEED));
         }
 
         public float GetNormalizedSpecial() {
-            return Mathf.Clamp(SpecialCounter / MAX_SPECIAL, 0, MAX_SPECIAL);
+            return Mathf.Clamp01(SpecialCounter / MAX_SPECIAL);
         }
 
         #endregion
@@ -153,7 +153,7 @@ namespace Tank {
             if (!collision.gameObject.CompareTag("Player")) return;
             if (state == TankState.BLOCK) {
                 _rb.constraints = RigidbodyConstraints.FreezeAll;
-                _agent.AddReward(.7f);
+                _agent.AddReward(.7f * GetNormalizedSpecial());
                 return;
             }
 
@@ -238,9 +238,8 @@ namespace Tank {
             }
 
 
-            float turnMod = GetNormalizedSpecial() > .1f ? 1 : .5f;
 
-            Vector3 turnTorque = turnMod * rotationRate * _input.RotationInput * (1 / driftModifier) * Vector3.up;
+            Vector3 turnTorque =  rotationRate * _input.RotationInput * (1 / driftModifier) * Vector3.up;
 
             turnTorque = Time.deltaTime * _rb.mass * turnTorque;
             _rb.AddTorque(turnTorque);
@@ -267,15 +266,15 @@ namespace Tank {
             SpecialCounter -= Mathf.Clamp(MAX_SPECIAL * .3f, 0 , MAX_SPECIAL);
             
             yield return new WaitUntil(BlockPredicate);
-
+            
             state = TankState.NORMAL;
             _rb.constraints = RigidbodyConstraints.None;
         }
 
         private bool BlockPredicate() {
-            _rb.AddForce(-_rb.velocity);
-            _rb.velocity = Vector3.zero;
-            _rb.position = transform.position;
+            _rb.AddForce(-_rb.velocity * .05f);
+//            _rb.velocity = Vector3.zero;
+//            _rb.position = transform.position;
             SpecialCounter -= specialRatePerSec * Time.deltaTime * 5;
             return !_input.Block || SpecialCounter <= 0;
         }
@@ -304,7 +303,7 @@ namespace Tank {
         }
 
         private IEnumerator ResetWait() {
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(.5f);
             _tm.ToggleThrust();
             _rb.isKinematic = false;
         }

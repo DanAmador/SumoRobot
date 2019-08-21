@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8b23992c8eb17439887f5e944bf04a40, type: 3}
-  m_Name: PlayerBrain
+  m_Name: RedBrain
   m_EditorClassIdentifier: 
   brainParameters:
     vectorObservationSize: 76
@@ -24,5 +24,5 @@ MonoBehaviour:
     - Turbo
     - Drift
     vectorActionSpaceType: 1
-  model: {fileID: -6785226784583654059, guid: 757603e62239ce44aba831e6a7d27707, type: 3}
+  model: {fileID: -8247298735771429961, guid: 1a2cfa5f6d409ee4aac509282b60f1da, type: 3}
   inferenceDevice: 0

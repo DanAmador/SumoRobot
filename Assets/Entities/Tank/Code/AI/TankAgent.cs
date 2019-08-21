@@ -7,11 +7,11 @@ using UnityEngine;
 namespace Tank.AI {
     public class TankAgent : Agent {
         private TankController _tank, _enemy;
-        private TankAgent _enemyAgent;
+        [SerializeField]private TankAgent _enemyAgent;
         public GameSessionManager gs;
         private TankInputs _input;
         private RayPerception3D _rayPerception;
-        [SerializeField] private bool _collectReward;
+        private bool _collectReward;
 
         private float _rayDistance;
         private readonly float[] _rayAngles = {0f, 45f, 70f, 90f, 135f, 180f, 110f, 270};
@@ -44,24 +44,24 @@ namespace Tank.AI {
 
 
             AddVectorObs(_rayPerception.Perceive(_rayDistance, _rayAngles, _playerObs, 0f, 0f));
-            AddVectorObs(_rayPerception.Perceive(_rayDistance * 0.6666667F, _rayAngles, _edgeObs, 0f, 0f));
+            AddVectorObs(_rayPerception.Perceive(_rayDistance, _rayAngles, _edgeObs, 0f, 0f));
 
             AddVectorObs(gs.MatchPercentageRemaining);
 
             AddVectorObs((int) _tank.state, Enum.GetValues(typeof(TankState)).Length);
             AddVectorObs((int) _enemy.state, Enum.GetValues(typeof(TankState)).Length);
 
-            AddVectorObs(Mathf.Clamp(1 - (_tank.GetNormalizedSpecial() / _tank.special4Block), 0f, 1f));
-            AddVectorObs(Mathf.Clamp(1 - (_tank.GetNormalizedSpecial() / (_tank.special4Boost )), 0f, 1));
-            AddVectorObs(Mathf.Clamp(1 - (_enemy.GetNormalizedSpecial() / _enemy.special4Block), 0f, 1f));
+            AddVectorObs(Mathf.Clamp01(1 - _tank.GetNormalizedSpecial() / _tank.special4Block));
+            AddVectorObs(Mathf.Clamp01(1 - _tank.GetNormalizedSpecial() / _tank.special4Boost));
+            AddVectorObs(Mathf.Clamp01(1 - _enemy.GetNormalizedSpecial() / _enemy.special4Block));
 
-            
+
             AddVectorObs(ForwardDot());
             AddVectorObs(_enemyAgent.ForwardDot());
-            
+
             AddVectorObs(_tank.GetNormalizedSpeed());
             AddVectorObs(_tank.GetNormalizedSpecial());
-            
+
 
             AddVectorObs(_enemy.GetNormalizedSpeed());
             AddVectorObs(_enemy.GetNormalizedSpecial());
@@ -74,8 +74,10 @@ namespace Tank.AI {
 
             AddVectorObs(vecTo);
 
-            AddVectorObs(1 - Vector2.Distance(_tank.lastCollisionPos, _tank.transform.position) / _tank.tooCloseLimit);
-            AddVectorObs(1 - Vector2.Distance(_enemy.lastCollisionPos, _enemy.transform.position) / _enemy.tooCloseLimit);
+            AddVectorObs(1 - Mathf.Clamp01(Vector2.Distance(_tank.lastCollisionPos, _tank.transform.position) /
+                                           _tank.tooCloseLimit));
+            AddVectorObs(1 - Mathf.Clamp01(Vector2.Distance(_enemy.lastCollisionPos, _enemy.transform.position) /
+                                           _enemy.tooCloseLimit));
         }
 
         public override void AgentAction(float[] vectorAction, string textAction) {
@@ -104,9 +106,9 @@ namespace Tank.AI {
 //            Debug.Log($"{brain.name} cumulative: {GetCumulativeReward()}");
 //            Debug.Log(totalReward.ToString("0.##########"));
 
-
-            Monitor.Log($"{gameObject.name} reward: ", GetCumulativeReward(), _enemy.transform);
-            Monitor.Log($"{gameObject.name} dot: ", ForwardDot(), _enemy.transform);
+//
+//            Monitor.Log($"{gameObject.name} reward: ", GetCumulativeReward(), _enemy.transform);
+//            Monitor.Log($"{gameObject.name} dot: ", ForwardDot(), _enemy.transform);
         }
 
         private void NormalReward() {
@@ -132,7 +134,7 @@ namespace Tank.AI {
         public void TackleReward(Vector3 col) {
             float totalReward = 0;
 
-            float forwardTackle = ForwardDot(col);
+            float forwardTackle = Mathf.Abs(ForwardDot(col));
 
             totalReward += .05f * gs.MatchPercentageRemaining;
 
@@ -147,12 +149,12 @@ namespace Tank.AI {
             totalReward += side * .02f;
             totalReward += forwardTackle * (_tank.state == TankState.BOOST ? 1 : .5f);
 
-            AddReward(Mathf.Clamp(totalReward, 0, 1));
+            AddReward(Mathf.Clamp01(totalReward));
         }
 
 
         public void Dead() {
-            float reward = gs.MatchPercentageRemaining;
+            float reward = Mathf.Clamp01(2 * gs.MatchPercentageRemaining);
             AddReward(-reward);
 //            _enemyAgent.AddReward(reward);
             _collectReward = false;

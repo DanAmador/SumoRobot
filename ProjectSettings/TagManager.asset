@@ -8,6 +8,7 @@ TagManager:
   - Edge
   - Platform
   - Star
+  - RecordCamera
   layers:
   - Default
   - TransparentFX
@@ -21,7 +22,7 @@ TagManager:
   - Edge
   - Player
   - Platform
-  - 
+  - Minimap
   - 
   - 
   - 

@@ -160,18 +160,18 @@ namespace Tank {
 
             TankController other = collision.gameObject.GetComponent<TankController>();
             float otherDot = other.ForwardDot(transform.position);
-            if (ForwardDot(other.transform.position) < otherDot) {
-                if (otherDot >= .5f) {
-                    Vector3 impulseForce = collision.impulse * 4;
+            if (Mathf.Abs(ForwardDot(other.transform.position)) < Mathf.Abs(otherDot)) {
+                if (Mathf.Abs(otherDot) >= .5f) {
+                    Vector3 impulseForce = collision.impulse;
                     switch (other.state) {
                     case TankState.BLOCK:
                         StartCoroutine(CollisionStateHandler());
-                        impulseForce = 7 * collision.impulse;
+                        impulseForce *= 7;
                         break;
                     case TankState.BOOST:
                         StartCoroutine(CollisionStateHandler());
                         SpecialCounter += MAX_SPECIAL * .3f;
-                        impulseForce = 3 * collision.impulse;
+                        impulseForce *= 3 ;
                         break;
                     }
 

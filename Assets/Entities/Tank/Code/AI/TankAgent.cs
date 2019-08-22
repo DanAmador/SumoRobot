@@ -107,8 +107,8 @@ namespace Tank.AI {
 //            Debug.Log(totalReward.ToString("0.##########"));
 
 //
-            Monitor.Log($"{gameObject.name} reward: ", GetCumulativeReward(), _enemy.transform);
-            Monitor.Log($"{gameObject.name} dot: ", ForwardDot(), _enemy.transform);
+//            Monitor.Log($"{gameObject.name} reward: ", GetCumulativeReward(), _enemy.transform);
+//            Monitor.Log($"{gameObject.name} dot: ", ForwardDot(), _enemy.transform);
         }
 
         private void NormalReward() {
@@ -138,8 +138,9 @@ namespace Tank.AI {
 
 
             // Is it facing the collision? 
-            if (forwardTackle < .5f) return;
             totalReward += .05f * gs.MatchPercentageRemaining;
+
+            if (forwardTackle < .5f) return;
 
             // Is it attacking the enemy from the side?
             float side = Mathf.Abs(
@@ -147,7 +148,7 @@ namespace Tank.AI {
 
 //            side = side >= .5f ? side : .5f;
             totalReward += side * .02f;
-            totalReward += forwardTackle * (_tank.state == TankState.BOOST ? 1 : .1f) * _tank.GetNormalizedSpeed();
+            totalReward += forwardTackle * (_tank.state == TankState.BOOST ? 1 : .4f);
 
             AddReward(Mathf.Clamp01(totalReward));
         }
@@ -156,7 +157,7 @@ namespace Tank.AI {
         public void Dead() {
             float reward = Mathf.Clamp01(2 * gs.MatchPercentageRemaining);
             AddReward(-reward);
-//            _enemyAgent.AddReward(reward);
+            if (_tank.MustFleeFromCollision) _enemyAgent.AddReward(reward);
             _collectReward = false;
             StartCoroutine(WaitBeforeReset(2));
         }

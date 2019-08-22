@@ -245,6 +245,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 963194225, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: m_TagString
+      value: BlueCamera
+      objectReference: {fileID: 0}
     - target: {fileID: 1199921407962986496, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -259,6 +263,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 160819169819991709, guid: 38771111e37af2d488a189e37cbabe33,
+        type: 3}
+      propertyPath: m_TagString
+      value: Untagged
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
@@ -356,6 +365,10 @@ PrefabInstance:
     - target: {fileID: 1611083055, guid: 64c4aa7ceaddc59448b07d62d8a05953, type: 3}
       propertyPath: m_BackGroundColor.b
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1611083053, guid: 64c4aa7ceaddc59448b07d62d8a05953, type: 3}
+      propertyPath: m_Layer
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1658306661, guid: 64c4aa7ceaddc59448b07d62d8a05953, type: 3}
       propertyPath: m_LocalPosition.z
@@ -952,6 +965,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 963194225, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: m_TagString
+      value: RedCamera
+      objectReference: {fileID: 0}
     - target: {fileID: 1199921407962986496, guid: 38771111e37af2d488a189e37cbabe33,
         type: 3}
       propertyPath: m_RootOrder
@@ -997,7 +1014,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 963194227, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
       propertyPath: m_TargetDisplay
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 963194227, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: m_projectionMatrixMode
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 963194227, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: field of view
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 1090943505, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
       propertyPath: m_Layer

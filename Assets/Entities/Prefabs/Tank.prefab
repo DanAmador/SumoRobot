@@ -77,7 +77,7 @@ GameObject:
   - component: {fileID: 264753364}
   m_Layer: 10
   m_Name: TrackCamera
-  m_TagString: MainCamera
+  m_TagString: RecordCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

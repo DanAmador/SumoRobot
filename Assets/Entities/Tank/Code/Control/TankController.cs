@@ -74,7 +74,7 @@ namespace Tank {
         void Start() {
             _agent = gameObject.GetComponent<TankAgent>();
             _accelRatePerSec = (MAX_SPEED - START_SPEED) / timeToMaxSpeed;
-            specialRatePerSec = MAX_SPECIAL/ timeToMAX_SPECIAL;
+            specialRatePerSec = MAX_SPECIAL / timeToMAX_SPECIAL;
             _rb = GetComponent<Rigidbody>();
             _tm = GetComponent<ThrusterManager>();
             _input = GetComponent<TankInputs>();
@@ -157,28 +157,36 @@ namespace Tank {
                 return;
             }
 
-            TankController collider = collision.gameObject.GetComponent<TankController>();
-            if (collider.state == TankState.BLOCK) {
-                StartCoroutine(CollisionStateHandler());
-                _rb.AddForceAtPosition(collision.transform.position, -2 * collision.impulse / Time.deltaTime);
+
+            TankController other = collision.gameObject.GetComponent<TankController>();
+            float otherDot = other.ForwardDot(transform.position);
+            if (ForwardDot(other.transform.position) < otherDot) {
+                if (otherDot >= .5f) {
+                    Vector3 impulseForce = collision.impulse * 4;
+                    switch (other.state) {
+                    case TankState.BLOCK:
+                        StartCoroutine(CollisionStateHandler());
+                        impulseForce = 7 * collision.impulse;
+                        break;
+                    case TankState.BOOST:
+                        StartCoroutine(CollisionStateHandler());
+                        SpecialCounter += MAX_SPECIAL * .3f;
+                        impulseForce = 3 * collision.impulse;
+                        break;
+                    }
+
+
+                    _rb.AddForce(impulseForce, ForceMode.Impulse);
+                }
             }
+            else {
+                if (!TooCloseFlag) {
+                    var position = collision.transform.position;
+                    _agent.TackleReward(position);
 
-            if (collider.state == TankState.BOOST) {
-                StartCoroutine(CollisionStateHandler());
-                SpecialCounter += MAX_SPECIAL * .3f;
-            }
-
-
-            if (!TooCloseFlag || !MustFleeFromCollision) {
-                var position = collision.transform.position;
-                _agent.TackleReward(position);
-                lastCollisionPos = position;
-                _lastColTime = Time.time;
-            }
-
-
-            if (state != TankState.BOOST) {
-                CurrentSpeed = START_SPEED;
+                    lastCollisionPos = position;
+                    _lastColTime = Time.time;
+                }
             }
         }
 
@@ -224,6 +232,11 @@ namespace Tank {
 
         #region Game Logic 
 
+        public float ForwardDot(Vector3 c) {
+            var transform1 = transform;
+            return Vector3.Dot(transform1.forward, (c - transform1.position).normalized);
+        }
+
         private void HandleMovement() {
             float driftModifier = _input.Drift ? 0.5f : 1;
 
@@ -238,8 +251,7 @@ namespace Tank {
             }
 
 
-
-            Vector3 turnTorque =  rotationRate * _input.RotationInput * (1 / driftModifier) * Vector3.up;
+            Vector3 turnTorque = rotationRate * _input.RotationInput * (1 / driftModifier) * Vector3.up;
 
             turnTorque = Time.deltaTime * _rb.mass * turnTorque;
             _rb.AddTorque(turnTorque);
@@ -263,10 +275,10 @@ namespace Tank {
 
         private IEnumerator BlockRoutine() {
             state = TankState.BLOCK;
-            SpecialCounter -= Mathf.Clamp(MAX_SPECIAL * .3f, 0 , MAX_SPECIAL);
-            
+            SpecialCounter -= Mathf.Clamp(MAX_SPECIAL * .3f, 0, MAX_SPECIAL);
+
             yield return new WaitUntil(BlockPredicate);
-            
+
             state = TankState.NORMAL;
             _rb.constraints = RigidbodyConstraints.None;
         }

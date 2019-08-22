@@ -20,13 +20,13 @@ namespace Tank {
 
         [field: Header("Gameplay Values")]
         [field: Range(5, 20)]
-        [field: SerializeField]
-        public float MAX_SPECIAL { get; } = 15;
+
+        private float MAX_SPECIAL { get; } = 15;
 
         private float CurrentSpeed { get; set; }
         private float SpecialCounter { get; set; }
 
-        private float TimeSinceLastCollision => lastCollisionPos == _initialPos ? 0 : Time.time - _lastColTime;
+        public float TimeSinceLastCollision => lastCollisionPos == _initialPos ? 0 : Time.time - _lastColTime;
 
         public bool MustFleeFromCollision => TimeSinceLastCollision < 3;
         public bool TooCloseFlag => Vector3.Distance(lastCollisionPos, transform.position) < tooCloseLimit;
@@ -162,7 +162,7 @@ namespace Tank {
             float otherDot = other.ForwardDot(transform.position);
             if (Mathf.Abs(ForwardDot(other.transform.position)) < Mathf.Abs(otherDot)) {
                 if (Mathf.Abs(otherDot) >= .5f) {
-                    Vector3 impulseForce = collision.impulse;
+                    Vector3 impulseForce = -collision.impulse * 1.5f;
                     switch (other.state) {
                     case TankState.BLOCK:
                         StartCoroutine(CollisionStateHandler());
@@ -171,7 +171,7 @@ namespace Tank {
                     case TankState.BOOST:
                         StartCoroutine(CollisionStateHandler());
                         SpecialCounter += MAX_SPECIAL * .3f;
-                        impulseForce *= 3 ;
+                        impulseForce *= 3;
                         break;
                     }
 

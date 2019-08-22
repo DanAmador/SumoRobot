@@ -78,6 +78,15 @@ namespace Tank.AI {
                                            _tank.tooCloseLimit));
             AddVectorObs(1 - Mathf.Clamp01(Vector2.Distance(_enemy.lastCollisionPos, _enemy.transform.position) /
                                            _enemy.tooCloseLimit));
+            
+            AddVectorObs(_tank.MustFleeFromCollision);
+            AddVectorObs(_tank.TooCloseFlag);
+            
+            AddVectorObs(1 - Mathf.Clamp01(_tank.TimeSinceLastCollision / (gs.roundDuration * .10f)));
+            AddVectorObs(1 - Mathf.Clamp01(_tank.TimeSinceLastCollision / 3));
+
+            AddVectorObs(_enemy.MustFleeFromCollision);
+            AddVectorObs(_enemy.TooCloseFlag);
         }
 
         public override void AgentAction(float[] vectorAction, string textAction) {
@@ -117,6 +126,9 @@ namespace Tank.AI {
 //            
 //            totalReward += .005f * _tank.GetNormalizedSpeed();
 
+            if (!_tank.MustFleeFromCollision && _tank.TimeSinceLastCollision > 4) {
+                totalReward -= .003f;
+            }
 
             if (_tank.TooCloseFlag && _tank.MustFleeFromCollision) {
                 totalReward -= .0003f * (1 - Vector2.Distance(_tank.transform.position, _tank.lastCollisionPos) /

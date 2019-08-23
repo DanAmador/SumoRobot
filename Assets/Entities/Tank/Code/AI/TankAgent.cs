@@ -3,6 +3,7 @@ using System.Collections;
 using GameSession;
 using MLAgents;
 using UnityEngine;
+using Random = System.Random;
 
 namespace Tank.AI {
     public class TankAgent : Agent {
@@ -14,7 +15,12 @@ namespace Tank.AI {
         private bool _collectReward;
 
         private float _rayDistance;
-        private readonly float[] _rayAngles = {0f, 45f, 70f, 90f, 135f, 180f, 110f, 270};
+
+        private readonly float[] _rayAngles = {
+            0f, 15f, 30f, 45f, 60f, 75f, 90f, 105f, 120f, 135f, 150, 165, 180f, 195, 210, 225, 240, 255, 270, 285, 300,
+            315, 330, 345
+        };
+
         private readonly string[] _playerObs = {"Player"};
         private readonly string[] _edgeObs = {"Edge"};
 
@@ -117,9 +123,9 @@ namespace Tank.AI {
 //            Debug.Log($"{brain.name} cumulative: {GetCumulativeReward()}");
 //            Debug.Log(totalReward.ToString("0.##########"));
 
-//
-//            if (gameObject.name == "Red") {
-//                Debug.Log($"{gameObject.name} reward: {GetCumulativeReward()}");
+
+//            if (gameObject.name == "Blue") {
+//                Debug.Log($"{gameObject.name} reward: {GetReward()}");
 ////                Debug.Log($"{gameObject.name} dot: {ForwardDot()}");
 //            }
         }
@@ -127,14 +133,15 @@ namespace Tank.AI {
         private void NormalReward() {
 //            Debug.Log(_tank.GetNormalizedSpecial());
             float totalReward = 0;
-//            
-
-            if (_tank.GetNormalizedSpeed() < .5f) totalReward -= .00005f * (1 - _tank.GetNormalizedSpeed());
-            if (_tank.onEdge) totalReward -= .0005f;
-            if (_tank.TooCloseFlag && _tank.MustFleeFromCollision)
+            totalReward += .0005f *
+                           (_tank.GetNormalizedSpeed() > .4f
+                               ? _tank.GetNormalizedSpeed()
+                               : Mathf.Clamp01(1 - _tank.GetNormalizedSpeed() * 3) * -1);
+            if (_tank.onEdge) totalReward -= .0006f;
+            if (_tank.TooCloseFlag && _tank.MustFleeFromCollision && _tank.numCollisions != 0)
                 totalReward -= .0003f * (1 - Vector2.Distance(_tank.transform.position, _tank.lastCollisionPos) /
                                          _tank.tooCloseLimit);
-            
+
             AddReward(totalReward);
         }
 
@@ -145,7 +152,8 @@ namespace Tank.AI {
 
 
             // Is it facing the collision? 
-            totalReward += .1f * gs.MatchPercentageRemaining;
+
+            AddReward(1f * gs.MatchPercentageRemaining);
 
             if (forwardTackle < .5f) return;
 
@@ -154,9 +162,9 @@ namespace Tank.AI {
                 Vector3.Dot(_tank.transform.forward.normalized, _enemy.transform.right.normalized));
 
 //            side = side >= .5f ? side : .5f;
-            totalReward += side * .02f;
-            totalReward += forwardTackle * (_tank.state == TankState.BOOST ? 1 : .4f) * _tank.GetNormalizedSpeed();
-//            Debug.Log(totalReward);
+            totalReward += side * .2f;
+            totalReward += forwardTackle * (_tank.state == TankState.BOOST ? 2 : .8f) * _tank.GetNormalizedSpeed();
+//            if(gameObject.name == "Blue") Debug.Log(totalReward);
             AddReward(Mathf.Clamp01(totalReward));
         }
 
@@ -178,6 +186,7 @@ namespace Tank.AI {
 
         public override void AgentReset() {
             gs.Reset();
+
             _collectReward = true;
         }
 
@@ -192,7 +201,7 @@ namespace Tank.AI {
         }
 
         private float ForwardDot(Vector3 c) {
-            Vector3 toCheck = c == Vector3.zero ? _enemy.transform.position : c;
+            Vector3 toCheck = (c == Vector3.zero ? _enemy.transform.position : c);
             return _tank.ForwardDot(toCheck);
         }
     }

@@ -78,10 +78,10 @@ namespace Tank.AI {
                                            _tank.tooCloseLimit));
             AddVectorObs(1 - Mathf.Clamp01(Vector2.Distance(_enemy.lastCollisionPos, _enemy.transform.position) /
                                            _enemy.tooCloseLimit));
-            
+
             AddVectorObs(_tank.MustFleeFromCollision);
             AddVectorObs(_tank.TooCloseFlag);
-            
+
             AddVectorObs(1 - Mathf.Clamp01(_tank.TimeSinceLastCollision / (gs.roundDuration * .10f)));
             AddVectorObs(1 - Mathf.Clamp01(_tank.TimeSinceLastCollision / 3));
 
@@ -102,6 +102,8 @@ namespace Tank.AI {
             }
 
             if (_collectReward) {
+                // KEEP MOVING BRUUUH 
+
                 NormalReward();
                 if (gs.MatchPercentageRemaining <= 0) {
                     AddReward(-.7f);
@@ -116,30 +118,23 @@ namespace Tank.AI {
 //            Debug.Log(totalReward.ToString("0.##########"));
 
 //
-//            Monitor.Log($"{gameObject.name} reward: ", GetCumulativeReward(), _enemy.transform);
-//            Monitor.Log($"{gameObject.name} dot: ", ForwardDot(), _enemy.transform);
+//            if (gameObject.name == "Red") {
+//                Debug.Log($"{gameObject.name} reward: {GetCumulativeReward()}");
+////                Debug.Log($"{gameObject.name} dot: {ForwardDot()}");
+//            }
         }
 
         private void NormalReward() {
 //            Debug.Log(_tank.GetNormalizedSpecial());
             float totalReward = 0;
 //            
-//            totalReward += .005f * _tank.GetNormalizedSpeed();
 
-            if (!_tank.MustFleeFromCollision && _tank.TimeSinceLastCollision > 4) {
-                totalReward -= .003f;
-            }
-
-            if (_tank.TooCloseFlag && _tank.MustFleeFromCollision) {
+            if (_tank.GetNormalizedSpeed() < .5f) totalReward -= .00005f * (1 - _tank.GetNormalizedSpeed());
+            if (_tank.onEdge) totalReward -= .0005f;
+            if (_tank.TooCloseFlag && _tank.MustFleeFromCollision)
                 totalReward -= .0003f * (1 - Vector2.Distance(_tank.transform.position, _tank.lastCollisionPos) /
                                          _tank.tooCloseLimit);
-            }
-
-            if (_tank.onEdge) {
-                totalReward -= .0005f;
-            }
-
-
+            
             AddReward(totalReward);
         }
 
@@ -150,7 +145,7 @@ namespace Tank.AI {
 
 
             // Is it facing the collision? 
-            totalReward += .05f * gs.MatchPercentageRemaining;
+            totalReward += .1f * gs.MatchPercentageRemaining;
 
             if (forwardTackle < .5f) return;
 
@@ -160,8 +155,8 @@ namespace Tank.AI {
 
 //            side = side >= .5f ? side : .5f;
             totalReward += side * .02f;
-            totalReward += forwardTackle * (_tank.state == TankState.BOOST ? 1 : .4f);
-
+            totalReward += forwardTackle * (_tank.state == TankState.BOOST ? 1 : .4f) * _tank.GetNormalizedSpeed();
+//            Debug.Log(totalReward);
             AddReward(Mathf.Clamp01(totalReward));
         }
 

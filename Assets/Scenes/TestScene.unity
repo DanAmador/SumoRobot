@@ -165,11 +165,10 @@ MonoBehaviour:
   turnRotationAngle: 0
   turnRotationSeekSpeed: 0
   state: 2
-  MAX_SPECIAL: 5
-  MAX_SPEED: 1000
-  START_SPEED: 200
+  MAX_ACCEL: 2000
+  START_ACCEL: 300
   timeToMaxSpeed: 2.5
-  timeToMaxSpecial: 5
+  timeToMAX_SPECIAL: 5
   special4Block: 0.4
   special4Boost: 0.1
   onEdge: 0
@@ -396,7 +395,7 @@ GameObject:
   - component: {fileID: 1110735023}
   - component: {fileID: 1110735022}
   - component: {fileID: 1110735021}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Ground
   m_TagString: Platform
   m_Icon: {fileID: 0}
@@ -507,6 +506,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tanks: []
+  roundDuration: 60
 --- !u!4 &1617943534
 Transform:
   m_ObjectHideFlags: 0
@@ -590,10 +590,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2035671392, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
-      propertyPath: rotationRate
-      value: 300
-      objectReference: {fileID: 0}
     - target: {fileID: 2035671393, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
       propertyPath: simulating
       value: 0
@@ -610,6 +606,14 @@ PrefabInstance:
     - target: {fileID: 956303407, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1090943507, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: m_Emitting
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2035671392, guid: 38771111e37af2d488a189e37cbabe33, type: 3}
+      propertyPath: rotationRate
+      value: 300
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 38771111e37af2d488a189e37cbabe33, type: 3}

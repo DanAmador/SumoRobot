@@ -25,15 +25,17 @@ namespace Tank {
 
         private float CurrentSpeed { get; set; }
         private float SpecialCounter { get; set; }
-
+        private bool colliding = false;
         public float TimeSinceLastCollision => lastCollisionPos == _initialPos ? 0 : Time.time - _lastColTime;
 
-        public bool MustFleeFromCollision => TimeSinceLastCollision < 3;
-        public bool TooCloseFlag => Vector3.Distance(lastCollisionPos, transform.position) < tooCloseLimit;
+        public bool MustFleeFromCollision => TimeSinceLastCollision < 3 && lastCollisionPos != _initialPos;
+
+        public bool TooCloseFlag => Vector3.Distance(lastCollisionPos, transform.position) < tooCloseLimit &&
+                                    lastCollisionPos != _initialPos;
 
 
-        [Range(800, 3000), SerializeField] private float MAX_SPEED = 2000;
-        [Range(150, 500), SerializeField] private float START_SPEED = 300;
+        [Range(800, 3000), SerializeField] private float MAX_ACCEL = 2000;
+        [Range(150, 500), SerializeField] private float START_ACCEL = 300;
         [Range(1, 5), SerializeField] private float timeToMaxSpeed = 2.5f;
         [Range(4, 10), SerializeField] private float timeToMAX_SPECIAL = 5f;
         [Range(0, 1)] public float special4Block = 0.4f;
@@ -56,8 +58,7 @@ namespace Tank {
 
         public float GetNormalizedSpeed() {
             if (state == TankState.BLOCK) return 0;
-
-            return Mathf.Clamp01((CurrentSpeed - START_SPEED) / (MAX_SPEED - START_SPEED));
+            return Mathf.Clamp01(_rb.velocity.magnitude / 45f);
         }
 
         public float GetNormalizedSpecial() {
@@ -73,12 +74,12 @@ namespace Tank {
 
         void Start() {
             _agent = gameObject.GetComponent<TankAgent>();
-            _accelRatePerSec = (MAX_SPEED - START_SPEED) / timeToMaxSpeed;
+            _accelRatePerSec = (MAX_ACCEL - START_ACCEL) / timeToMaxSpeed;
             specialRatePerSec = MAX_SPECIAL / timeToMAX_SPECIAL;
             _rb = GetComponent<Rigidbody>();
             _tm = GetComponent<ThrusterManager>();
             _input = GetComponent<TankInputs>();
-            CurrentSpeed = START_SPEED;
+            CurrentSpeed = START_ACCEL;
             state = TankState.NORMAL;
             var transform1 = transform;
             _initialPos = transform1.position;
@@ -97,7 +98,7 @@ namespace Tank {
             _rb.angularVelocity = Vector3.zero;
             _rb.isKinematic = true;
             state = TankState.NORMAL;
-            CurrentSpeed = START_SPEED;
+            CurrentSpeed = START_ACCEL;
             SpecialCounter = 0;
 
             _rb.constraints = RigidbodyConstraints.None;
@@ -116,7 +117,7 @@ namespace Tank {
 
                 CurrentSpeed = Mathf.Clamp(
                     CurrentSpeed + Mathf.Abs(_input.ForwardInput) * _accelRatePerSec * Time.deltaTime,
-                    START_SPEED, MAX_SPEED);
+                    START_ACCEL, MAX_ACCEL);
 
 
                 if (_input.Turbo) {
@@ -135,7 +136,7 @@ namespace Tank {
             if (Mathf.Abs(_input.ForwardInput) < .50f) {
                 CurrentSpeed = Mathf.Clamp(
                     CurrentSpeed - _accelRatePerSec * Time.deltaTime * .25f,
-                    START_SPEED, MAX_SPEED);
+                    START_ACCEL, MAX_ACCEL);
             }
         }
 
@@ -150,28 +151,29 @@ namespace Tank {
 
         //I really should've used a State or Observer Design pattern ... this is a fucking mess, but it's too late now, sorry :( 
         private void OnCollisionEnter(Collision collision) {
-            if (!collision.gameObject.CompareTag("Player")) return;
+            if (!collision.gameObject.CompareTag("Player") || colliding) return;
             if (state == TankState.BLOCK) {
                 _rb.constraints = RigidbodyConstraints.FreezeAll;
                 _agent.AddReward(.7f * GetNormalizedSpecial());
                 return;
             }
 
+            colliding = true;
 
             TankController other = collision.gameObject.GetComponent<TankController>();
             float otherDot = other.ForwardDot(transform.position);
             if (Mathf.Abs(ForwardDot(other.transform.position)) < Mathf.Abs(otherDot)) {
                 if (Mathf.Abs(otherDot) >= .5f) {
-                    Vector3 impulseForce = -collision.impulse * 1.5f;
+                    Vector3 impulseForce = -collision.impulse;
                     switch (other.state) {
                     case TankState.BLOCK:
                         StartCoroutine(CollisionStateHandler());
-                        impulseForce *= 7;
+                        impulseForce *= 3f;
                         break;
                     case TankState.BOOST:
                         StartCoroutine(CollisionStateHandler());
                         SpecialCounter += MAX_SPECIAL * .3f;
-                        impulseForce *= 3;
+                        if (state != TankState.BOOST) impulseForce *= 2;
                         break;
                     }
 
@@ -192,6 +194,7 @@ namespace Tank {
 
         private void OnCollisionExit(Collision collision) {
             if (collision.gameObject.CompareTag("Player")) {
+                colliding = false;
                 if (state == TankState.BLOCK) {
                     _rb.constraints = RigidbodyConstraints.None;
                 }
@@ -295,7 +298,7 @@ namespace Tank {
             state = TankState.BOOST;
             float oldSpeed = CurrentSpeed;
             CurrentSpeed = Mathf.Clamp(CurrentSpeed + CurrentSpeed * GetNormalizedSpecial() * 2, CurrentSpeed,
-                MAX_SPEED * 1.5f);
+                MAX_ACCEL * 1.5f);
             yield return new WaitForSeconds(1);
 
             SpecialCounter = Mathf.Clamp(SpecialCounter - MAX_SPECIAL * special4Boost, 0, MAX_SPECIAL);
@@ -308,7 +311,7 @@ namespace Tank {
 
         private IEnumerator CollisionStateHandler() {
             state = TankState.COLLIDED;
-            CurrentSpeed = START_SPEED;
+            CurrentSpeed = START_ACCEL;
             yield return new WaitForSeconds(1);
 
             state = TankState.NORMAL;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using Tank.AI;
+using TMPro;
 using UnityEngine;
 
 namespace Tank {
@@ -25,13 +26,13 @@ namespace Tank {
 
         private float CurrentSpeed { get; set; }
         private float SpecialCounter { get; set; }
-        private bool colliding = false;
+        private bool _colliding ;
+        public int numCollisions;
         public float TimeSinceLastCollision => lastCollisionPos == _initialPos ? 0 : Time.time - _lastColTime;
 
-        public bool MustFleeFromCollision => TimeSinceLastCollision < 3 && lastCollisionPos != _initialPos;
+        public bool MustFleeFromCollision => TimeSinceLastCollision < 3;
 
-        public bool TooCloseFlag => Vector3.Distance(lastCollisionPos, transform.position) < tooCloseLimit &&
-                                    lastCollisionPos != _initialPos;
+        public bool TooCloseFlag => Vector3.Distance(lastCollisionPos, transform.position) < tooCloseLimit;
 
 
         [Range(800, 3000), SerializeField] private float MAX_ACCEL = 2000;
@@ -100,9 +101,17 @@ namespace Tank {
             state = TankState.NORMAL;
             CurrentSpeed = START_ACCEL;
             SpecialCounter = 0;
-
+            
             _rb.constraints = RigidbodyConstraints.None;
+            numCollisions = 0;
+            
+            //For training purposes only. I'm too lazy to do it right. 
+            Vector3 rot = transform.rotation.eulerAngles;
+            rot.y = UnityEngine.Random.insideUnitCircle.y;
+            transform.rotation = Quaternion.Euler(rot);
+            
             StartCoroutine(ResetWait());
+            
         }
 
         private void Update() {
@@ -151,15 +160,14 @@ namespace Tank {
 
         //I really should've used a State or Observer Design pattern ... this is a fucking mess, but it's too late now, sorry :( 
         private void OnCollisionEnter(Collision collision) {
-            if (!collision.gameObject.CompareTag("Player") || colliding) return;
+            if (!collision.gameObject.CompareTag("Player") || _colliding) return;
             if (state == TankState.BLOCK) {
                 _rb.constraints = RigidbodyConstraints.FreezeAll;
                 _agent.AddReward(.7f * GetNormalizedSpecial());
                 return;
             }
 
-            colliding = true;
-
+            _colliding = true;
             TankController other = collision.gameObject.GetComponent<TankController>();
             float otherDot = other.ForwardDot(transform.position);
             if (Mathf.Abs(ForwardDot(other.transform.position)) < Mathf.Abs(otherDot)) {
@@ -183,6 +191,8 @@ namespace Tank {
             }
             else {
                 if (!TooCloseFlag) {
+                    numCollisions++;
+
                     var position = collision.transform.position;
                     _agent.TackleReward(position);
 
@@ -194,7 +204,7 @@ namespace Tank {
 
         private void OnCollisionExit(Collision collision) {
             if (collision.gameObject.CompareTag("Player")) {
-                colliding = false;
+                _colliding = false;
                 if (state == TankState.BLOCK) {
                     _rb.constraints = RigidbodyConstraints.None;
                 }

@@ -107,7 +107,7 @@ namespace Tank {
             
             //For training purposes only. I'm too lazy to do it right. 
             Vector3 rot = transform.rotation.eulerAngles;
-            rot.y = UnityEngine.Random.insideUnitCircle.y;
+            rot.y = UnityEngine.Random.Range(0, 360);
             transform.rotation = Quaternion.Euler(rot);
             
             StartCoroutine(ResetWait());

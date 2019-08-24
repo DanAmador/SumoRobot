@@ -108,8 +108,6 @@ namespace Tank.AI {
             }
 
             if (_collectReward) {
-                // KEEP MOVING BRUUUH 
-
                 NormalReward();
                 if (gs.MatchPercentageRemaining <= 0) {
                     AddReward(-.7f);
@@ -133,10 +131,18 @@ namespace Tank.AI {
         private void NormalReward() {
 //            Debug.Log(_tank.GetNormalizedSpecial());
             float totalReward = 0;
-            totalReward += .0005f *
-                           (_tank.GetNormalizedSpeed() > .4f
-                               ? _tank.GetNormalizedSpeed()
-                               : Mathf.Clamp01(1 - _tank.GetNormalizedSpeed() * 3) * -1);
+
+            // KEEP MOVING BRUUUH 
+            if (_input.ForwardInput > 0) {
+                totalReward += _input.ForwardInput * _tank.GetNormalizedSpeed() * .001f;
+            }
+            else {
+                totalReward += .0005f *
+                               (_tank.GetNormalizedSpeed() > .5f
+                                   ? 0
+                                   : Mathf.Clamp01(1 - _tank.GetNormalizedSpeed() * 3) * -1);
+            }
+
             if (_tank.onEdge) totalReward -= .0006f;
             if (_tank.TooCloseFlag && _tank.MustFleeFromCollision && _tank.numCollisions != 0)
                 totalReward -= .0003f * (1 - Vector2.Distance(_tank.transform.position, _tank.lastCollisionPos) /

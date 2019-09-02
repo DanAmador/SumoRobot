@@ -115,7 +115,7 @@ namespace Tank {
         }
 
         private void Update() {
-            Debug.DrawLine(lastCollisionPos, lastCollisionPos + transform.up * 10);
+//            Debug.DrawLine(lastCollisionPos, lastCollisionPos + transform.up * 10);
 
             if (state == TankState.NORMAL) {
                 SpecialCounter =
@@ -172,7 +172,7 @@ namespace Tank {
             float otherDot = other.ForwardDot(transform.position);
             if (Mathf.Abs(ForwardDot(other.transform.position)) < Mathf.Abs(otherDot)) {
                 if (Mathf.Abs(otherDot) >= .5f) {
-                    Vector3 impulseForce = -collision.impulse;
+                    Vector3 impulseForce = -collision.impulse * 1.5f;
                     switch (other.state) {
                     case TankState.BLOCK:
                         StartCoroutine(CollisionStateHandler());

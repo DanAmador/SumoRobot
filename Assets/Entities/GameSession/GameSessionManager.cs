@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Platform;
 using Tank;
 using UnityEngine;
@@ -8,12 +9,14 @@ namespace GameSession {
         [SerializeField] private TankController[] tanks;
         private PlatformMover _platform;
         private float _matchStart;
-        public float roundDuration = 600; // in seconds 
+        public float roundDuration = 120; // in seconds 
 
         public float MatchPercentageRemaining => 1 - (Time.time - _matchStart) / roundDuration;
+        public float SecondsRemaining => roundDuration - (Time.time - _matchStart);
 
+        
 
-        public void Awake() {
+        public void Awake() {    
             _platform = GetComponentInChildren<PlatformMover>();
             _matchStart = Time.time;
         }

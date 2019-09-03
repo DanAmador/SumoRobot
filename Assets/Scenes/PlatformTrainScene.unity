@@ -1812,7 +1812,7 @@ MonoBehaviour:
   - {fileID: 537307593}
   - {fileID: 211246376}
   txt: {fileID: 422715652}
-  roundDuration: 10
+  roundDuration: 60
 --- !u!4 &1801404477
 Transform:
   m_ObjectHideFlags: 0

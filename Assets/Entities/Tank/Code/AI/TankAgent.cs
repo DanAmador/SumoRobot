@@ -100,11 +100,11 @@ namespace Tank.AI {
                 _input.ForwardInput = vectorAction[0];
                 _input.RotationInput = vectorAction[1];
 
-                if (vectorAction[2] > .6)
+                if (vectorAction[2] > .5)
                     _input.VirtualInputSimulate(Buttons.BLOCK, ((vectorAction[2] - .6f) / .4f) * 2);
-                if (vectorAction[3] > .8)
+                if (vectorAction[3] > .6)
                     _input.VirtualInputSimulate(Buttons.TURBO, ((vectorAction[3] - .8f) / .4f) * 2);
-                if (vectorAction[4] > .6) _input.VirtualInputSimulate(Buttons.DRIFT);
+                if (vectorAction[4] > .3) _input.VirtualInputSimulate(Buttons.DRIFT);
             }
 
             if (_collectReward) {

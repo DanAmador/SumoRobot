@@ -28,10 +28,7 @@ namespace GameSession {
 
         public void Update() {
             txt.text = SecondsRemaining;
-            if (MatchPercentageRemaining < .3f && !_colorUpdated) {
-                txt.color = new Color(1f, 0.49f, 0.73f);
-                _colorUpdated = true;
-            }
+            txt.color = Color.Lerp(Color.red, Color.white, MatchPercentageRemaining);
         }
 
         public TankController GetEnemy(TankController player) {
@@ -46,7 +43,6 @@ namespace GameSession {
             _matchStart = Time.time;
             _platform.Reset();
             _colorUpdated = false;
-            txt.color = Color.white;
         }
     }
 }

@@ -1281,6 +1281,7 @@ MonoBehaviour:
     - {fileID: 0}
     - {fileID: 11400000, guid: c5e7319704b40b545af559a0e0d7a0e3, type: 2}
     - {fileID: 11400000, guid: 847edc46f95757d429a75731f33479ab, type: 2}
+    - {fileID: 11400000, guid: f34c3fa79243bfa4ca6d433622d7eb47, type: 2}
   maxSteps: -1
   trainingConfiguration:
     width: 80
@@ -1292,10 +1293,16 @@ MonoBehaviour:
     width: 1280
     height: 720
     qualityLevel: 5
-    timeScale: 1
+    timeScale: 15
     targetFrameRate: 60
   resetParameters:
-    resetParameters: []
+    resetParameters:
+    - key: spawnVariance
+      value: 0
+    - key: special4Boost
+      value: 0.1
+    - key: special4Block
+      value: 0.2
 --- !u!4 &1169435223
 Transform:
   m_ObjectHideFlags: 0

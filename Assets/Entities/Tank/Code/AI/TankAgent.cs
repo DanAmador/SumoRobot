@@ -138,7 +138,7 @@ namespace Tank.AI {
 
             // KEEP MOVING BRUUUH 
             if (_input.ForwardInput > 0 && _tank.state != TankState.BLOCK) {
-                totalReward += _input.ForwardInput * _tank.GetNormalizedSpeed() * Distance2Target() * .001f;
+                totalReward += _input.ForwardInput * _tank.GetNormalizedSpeed() * .001f;
             }
             else {
                 totalReward += .0005f *
@@ -221,12 +221,11 @@ namespace Tank.AI {
         }
 
         private void SetResetParameters() {
-            
-                Vector3 rand = UnityEngine.Random.onUnitSphere * _resetParameters["spawnVariance"];
-                rand.y = 0;
-                _tank.transform.position += rand;
-                _tank.special4Block = _resetParameters["special4Block"];
-                _tank.special4Boost = _resetParameters["special4Boost"];
+            Vector3 rand = UnityEngine.Random.onUnitSphere * _resetParameters["spawnVariance"];
+            rand.y = 0;
+            _tank.transform.position += rand;
+            _tank.special4Block = _resetParameters["special4Block"];
+            _tank.special4Boost = _resetParameters["special4Boost"];
         }
     }
 }

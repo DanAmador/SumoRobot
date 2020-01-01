@@ -13,8 +13,9 @@ namespace Tank.AI {
         private TankInputs _input;
         private RayPerception3D _rayPerception;
         private bool _collectReward;
-
         private float _rayDistance;
+
+        private ResetParameters _resetParameters;
 
         private readonly float[] _rayAngles = {
             0f, 15f, 30f, 45f, 60f, 75f, 90f, 105f, 120f, 135f, 150, 165, 180f, 195, 210, 225, 240, 255, 270, 285, 300,
@@ -37,6 +38,10 @@ namespace Tank.AI {
 
             _rayPerception = GetComponent<RayPerception3D>();
             _collectReward = true;
+
+
+            TankAcademy academy = FindObjectOfType<TankAcademy>();
+            _resetParameters = academy.resetParameters;
         }
 
         public override void CollectObservations() {
@@ -71,7 +76,6 @@ namespace Tank.AI {
 
             AddVectorObs(_enemy.GetNormalizedSpeed());
             AddVectorObs(_enemy.GetNormalizedSpecial());
-
             AddVectorObs(_tank.onEdge);
             AddVectorObs(_enemy.onEdge);
 
@@ -101,9 +105,9 @@ namespace Tank.AI {
                 _input.RotationInput = vectorAction[1];
 
                 if (vectorAction[2] > .5)
-                    _input.VirtualInputSimulate(Buttons.BLOCK, ((vectorAction[2] - .6f) / .4f) * 2);
-                if (vectorAction[3] > .6)
-                    _input.VirtualInputSimulate(Buttons.TURBO, ((vectorAction[3] - .8f) / .4f) * 2);
+                    _input.VirtualInputSimulate(Buttons.BLOCK, Mathf.Abs(vectorAction[2]) * 2);
+                if (vectorAction[3] > .3)
+                    _input.VirtualInputSimulate(Buttons.TURBO, Mathf.Abs(vectorAction[3]) * 2);
                 if (vectorAction[4] > .3) _input.VirtualInputSimulate(Buttons.DRIFT);
             }
 
@@ -133,14 +137,18 @@ namespace Tank.AI {
             float totalReward = 0;
 
             // KEEP MOVING BRUUUH 
-            if (_input.ForwardInput > 0) {
-                totalReward += _input.ForwardInput * _tank.GetNormalizedSpeed() * .001f;
+            if (_input.ForwardInput > 0 && _tank.state != TankState.BLOCK) {
+                totalReward += _input.ForwardInput * _tank.GetNormalizedSpeed() * Distance2Target() * .001f;
             }
             else {
                 totalReward += .0005f *
                                (_tank.GetNormalizedSpeed() > .5f
                                    ? 0
                                    : Mathf.Clamp01(1 - _tank.GetNormalizedSpeed() * 3) * -1);
+            }
+
+            if (_tank.state == TankState.BLOCK && _enemy.state == TankState.COLLIDED) {
+                totalReward += .0006f;
             }
 
             if (_tank.onEdge) totalReward -= .0006f;
@@ -192,6 +200,7 @@ namespace Tank.AI {
 
         public override void AgentReset() {
             gs.Reset();
+            SetResetParameters();
 
             _collectReward = true;
         }
@@ -209,6 +218,15 @@ namespace Tank.AI {
         private float ForwardDot(Vector3 c) {
             Vector3 toCheck = (c == Vector3.zero ? _enemy.transform.position : c);
             return _tank.ForwardDot(toCheck);
+        }
+
+        private void SetResetParameters() {
+            
+                Vector3 rand = UnityEngine.Random.onUnitSphere * _resetParameters["spawnVariance"];
+                rand.y = 0;
+                _tank.transform.position += rand;
+                _tank.special4Block = _resetParameters["special4Block"];
+                _tank.special4Boost = _resetParameters["special4Boost"];
         }
     }
 }

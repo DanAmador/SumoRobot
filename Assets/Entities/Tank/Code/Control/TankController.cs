@@ -172,7 +172,7 @@ namespace Tank {
             float otherDot = other.ForwardDot(transform.position);
             if (Mathf.Abs(ForwardDot(other.transform.position)) < Mathf.Abs(otherDot)) {
                 if (Mathf.Abs(otherDot) >= .5f) {
-                    Vector3 impulseForce = -collision.impulse * 1.5f;
+                    Vector3 impulseForce = -collision.impulse * 1.2f;
                     switch (other.state) {
                     case TankState.BLOCK:
                         StartCoroutine(CollisionStateHandler());
@@ -181,7 +181,7 @@ namespace Tank {
                     case TankState.BOOST:
                         StartCoroutine(CollisionStateHandler());
                         SpecialCounter += MAX_SPECIAL * .3f;
-                        if (state != TankState.BOOST) impulseForce *= 2;
+                        if (state != TankState.BOOST) impulseForce *= 1.5f;
                         break;
                     }
 
@@ -300,7 +300,7 @@ namespace Tank {
             _rb.AddForce(-_rb.velocity * .05f);
 //            _rb.velocity = Vector3.zero;
 //            _rb.position = transform.position;
-            SpecialCounter -= specialRatePerSec * Time.deltaTime * 5;
+//            SpecialCounter -= specialRatePerSec * Time.deltaTime * 5;
             return !_input.Block || SpecialCounter <= 0;
         }
 
@@ -336,5 +336,6 @@ namespace Tank {
         #endregion
 
         #endregion
+        
     }
 }

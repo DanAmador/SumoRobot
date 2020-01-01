@@ -20,3 +20,8 @@ default:
   use_recurrent: false
   memory_size: 128
   sequence_length: 16
+
+  reward_signals:
+    extrinsic:
+      strength: 1.0
+      gamma: 0.995

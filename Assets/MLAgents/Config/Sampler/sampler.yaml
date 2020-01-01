@@ -2,17 +2,17 @@ resampling-interval: 10000
 
 special4Block:
   sampler-type: "uniform"
-  min_value: 0.4,
+  min_value: 0.4
   max_value: 0.99
 
 
 special4Boost:
   sampler-type: "uniform"
-  min_value: 0.1,
+  min_value: 0.1
   max_value: 0.99
 
 
 spawnVariance:
   sampler-type: "uniform"
-  min_value: 0.0,
+  min_value: 0.0
   max_value: 20

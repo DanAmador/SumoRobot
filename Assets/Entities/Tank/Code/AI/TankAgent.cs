@@ -55,7 +55,7 @@ namespace Tank.AI {
 
 
             AddVectorObs(_rayPerception.Perceive(_rayDistance, _rayAngles, _playerObs, 0f, 0f));
-            AddVectorObs(_rayPerception.Perceive(_rayDistance * 0.6666667F, _rayAngles, _edgeObs, 0f, 0f));
+            AddVectorObs(_rayPerception.Perceive(_rayDistance * 1.5f, _rayAngles, _edgeObs, 0f, 0f));
 
             AddVectorObs(gs.MatchPercentageRemaining);
 
@@ -92,8 +92,7 @@ namespace Tank.AI {
             AddVectorObs(_tank.MustFleeFromCollision);
             AddVectorObs(_tank.TooCloseFlag);
 
-            AddVectorObs(1 - Mathf.Clamp01(_tank.TimeSinceLastCollision / (gs.roundDuration * .10f)));
-            AddVectorObs(1 - Mathf.Clamp01(_tank.TimeSinceLastCollision / 3));
+            AddVectorObs(Mathf.Clamp01(_tank.TimeSinceLastCollision / (gs.roundDuration * .10f)));
 
             AddVectorObs(_enemy.MustFleeFromCollision);
             AddVectorObs(_enemy.TooCloseFlag);
@@ -120,40 +119,35 @@ namespace Tank.AI {
                 }
             }
 
-//            Vector3 vecTo = (enemy.transform.position - transform.position);
-//            Debug.Log("Reward: " + GetReward() );
-//            Debug.Log($"{brain.name} cumulative: {GetCumulativeReward()}");
-//            Debug.Log(totalReward.ToString("0.##########"));
 
-
-//            if (gameObject.name == "Blue") {
-//                Debug.Log($"{gameObject.name} reward: {GetReward()}");
-////                Debug.Log($"{gameObject.name} dot: {ForwardDot()}");
-//            }
         }
 
         private void NormalReward() {
-//            Debug.Log(_tank.GetNormalizedSpecial());
             float totalReward = 0;
 
 
             //Optimize being inside of circle and being outside for enemy
             totalReward += (1 - gs.UnitDistance2Center(_tank.transform)) * .0002f;
             totalReward += gs.UnitDistance2Center(_enemy.transform) * .0005f;
+          
+            //incentivize constant hitting
+            if (_tank.TimeSinceLastCollision / (gs.roundDuration * .10f) >= .9f) {
+                totalReward += -.003f;
+            }
+
             // KEEP MOVING BRUUUH 
-            if (_input.ForwardInput > 0 && _tank.state != TankState.BLOCK) {
+            if (_input.ForwardInput > 0) {
                 totalReward += _input.ForwardInput * _tank.GetNormalizedSpeed() * .001f;
             }
             else {
+                //Velocity needs to be maintained 
                 totalReward += .0005f *
                                (_tank.GetNormalizedSpeed() > .5f
                                    ? 0
                                    : Mathf.Clamp01(1 - _tank.GetNormalizedSpeed() * 3) * -1);
             }
 
-            if (_tank.state == TankState.BLOCK && _enemy.state == TankState.COLLIDED) {
-                totalReward += .006f;
-            }
+
 
             if (_tank.onEdge) totalReward -= .0006f;
             if (_tank.TooCloseFlag && _tank.MustFleeFromCollision && _tank.numCollisions != 0)
@@ -178,11 +172,12 @@ namespace Tank.AI {
             // Is it attacking the enemy from the side?
             float side = Mathf.Abs(
                 Vector3.Dot(_tank.transform.forward.normalized, _enemy.transform.right.normalized));
-
-//            side = side >= .5f ? side : .5f;
+            
+            if (_tank.state == TankState.BLOCK && _enemy.state == TankState.COLLIDED) {
+                totalReward += .01f;
+            }
             totalReward += side * .2f;
             totalReward += forwardTackle * (_tank.state == TankState.BOOST ? 2 : .8f) * _tank.GetNormalizedSpeed();
-//            if(gameObject.name == "Blue") Debug.Log(totalReward);
             AddReward(Mathf.Clamp01(totalReward));
         }
 

@@ -26,7 +26,7 @@ namespace Tank {
 
         private float CurrentSpeed { get; set; }
         private float SpecialCounter { get; set; }
-        private bool _colliding ;
+        private bool _colliding;
         public int numCollisions;
         public float TimeSinceLastCollision => lastCollisionPos == _initialPos ? 0 : Time.time - _lastColTime;
 
@@ -46,13 +46,14 @@ namespace Tank {
 
         [Header("Internal variables")] public bool onEdge;
 
+        public TankAgent agent;
+
         [NonSerialized] public Vector3 lastCollisionPos;
         [NonSerialized] private TankInputs _input;
         private Rigidbody _rb;
         private ThrusterManager _tm;
         private Vector3 _initialPos;
         private Quaternion _initialRot;
-        [SerializeField] private TankAgent _agent;
         public float tooCloseLimit = 15;
 
         #region Getters
@@ -74,7 +75,7 @@ namespace Tank {
         #region Mono Methods
 
         void Start() {
-            _agent = gameObject.GetComponent<TankAgent>();
+            agent = gameObject.GetComponent<TankAgent>();
             _accelRatePerSec = (MAX_ACCEL - START_ACCEL) / timeToMaxSpeed;
             specialRatePerSec = MAX_SPECIAL / timeToMAX_SPECIAL;
             _rb = GetComponent<Rigidbody>();
@@ -101,17 +102,16 @@ namespace Tank {
             state = TankState.NORMAL;
             CurrentSpeed = START_ACCEL;
             SpecialCounter = 0;
-            
+
             _rb.constraints = RigidbodyConstraints.None;
             numCollisions = 0;
-            
+
             //For training purposes only. I'm too lazy to do it right. 
             Vector3 rot = transform.rotation.eulerAngles;
             rot.y = UnityEngine.Random.Range(0, 360);
             transform.rotation = Quaternion.Euler(rot);
-            
+
             StartCoroutine(ResetWait());
-            
         }
 
         private void Update() {
@@ -163,7 +163,7 @@ namespace Tank {
             if (!collision.gameObject.CompareTag("Player") || _colliding) return;
             if (state == TankState.BLOCK) {
                 _rb.constraints = RigidbodyConstraints.FreezeAll;
-                _agent.AddReward(.7f * GetNormalizedSpecial());
+                agent.AddReward(.7f * GetNormalizedSpecial());
                 return;
             }
 
@@ -172,11 +172,15 @@ namespace Tank {
             float otherDot = other.ForwardDot(transform.position);
             if (Mathf.Abs(ForwardDot(other.transform.position)) < Mathf.Abs(otherDot)) {
                 if (Mathf.Abs(otherDot) >= .5f) {
-                    Vector3 impulseForce = -collision.impulse * 1.2f;
+                    Vector3 impulseForce = -collision.impulse * 1.5f;
                     switch (other.state) {
                     case TankState.BLOCK:
                         StartCoroutine(CollisionStateHandler());
                         impulseForce *= 3f;
+                        if (other.agent) {
+                            other.agent.AddReward(.5f);
+                        }
+
                         break;
                     case TankState.BOOST:
                         StartCoroutine(CollisionStateHandler());
@@ -194,7 +198,7 @@ namespace Tank {
                     numCollisions++;
 
                     var position = collision.transform.position;
-                    _agent.TackleReward(position);
+                    agent.TackleReward(position);
 
                     lastCollisionPos = position;
                     _lastColTime = Time.time;
@@ -220,7 +224,7 @@ namespace Tank {
 
             if (other.gameObject.CompareTag("Death")) {
                 state = TankState.DEAD;
-                _agent.Dead();
+                agent.Dead();
             }
         }
 
@@ -336,6 +340,5 @@ namespace Tank {
         #endregion
 
         #endregion
-        
     }
 }

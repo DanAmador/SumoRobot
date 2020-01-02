@@ -136,6 +136,10 @@ namespace Tank.AI {
 //            Debug.Log(_tank.GetNormalizedSpecial());
             float totalReward = 0;
 
+
+            //Optimize being inside of circle and being outside for enemy
+            totalReward += (1 - gs.UnitDistance2Center(_tank.transform)) * .0002f;
+            totalReward += gs.UnitDistance2Center(_enemy.transform) * .0005f;
             // KEEP MOVING BRUUUH 
             if (_input.ForwardInput > 0 && _tank.state != TankState.BLOCK) {
                 totalReward += _input.ForwardInput * _tank.GetNormalizedSpeed() * .001f;
@@ -148,7 +152,7 @@ namespace Tank.AI {
             }
 
             if (_tank.state == TankState.BLOCK && _enemy.state == TankState.COLLIDED) {
-                totalReward += .0006f;
+                totalReward += .006f;
             }
 
             if (_tank.onEdge) totalReward -= .0006f;
@@ -200,9 +204,8 @@ namespace Tank.AI {
 
         public override void AgentReset() {
             gs.Reset();
-            SetResetParameters();
-
             _collectReward = true;
+            SetResetParameters();
         }
 
 

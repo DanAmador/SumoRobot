@@ -29,6 +29,11 @@ namespace GameSession {
         public void Update() {
             txt.text = SecondsRemaining;
             txt.color = Color.Lerp(Color.red, Color.white, MatchPercentageRemaining);
+
+            //quick hax
+            if (Input.GetKeyDown(KeyCode.L)) {
+                tanks.First().agent.Dead();
+            }
         }
 
         public TankController GetEnemy(TankController player) {
@@ -43,6 +48,10 @@ namespace GameSession {
             _matchStart = Time.time;
             _platform.Reset();
             _colorUpdated = false;
+        }
+
+        public float UnitDistance2Center(Transform target) {
+            return Vector3.Distance(target.position, transform.position) / 50;
         }
     }
 }

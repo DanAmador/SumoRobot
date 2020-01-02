@@ -24,5 +24,5 @@ MonoBehaviour:
     - Turbo
     - Drift
     vectorActionSpaceType: 1
-  model: {fileID: 5022602860645237092, guid: 84514d558dbfa3b4dba29a993eea6bec, type: 3}
+  model: {fileID: 5022602860645237092, guid: de05741a4ba2ea848be74c40126d14ca, type: 3}
   inferenceDevice: 0

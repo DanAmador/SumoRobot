@@ -1,6 +1,6 @@
 # Do you like sumo ?
 
-## Do you like wonky physics?
+## Do you like wonky  physics and _hover cars_!?
 
 ### Do you like ***Reinforcement Learning***!?
 
@@ -8,7 +8,7 @@ Then you'll love stupid car sumo simulation trained with [Unity MLAgents](https:
 
 
 
-This is an experiment I bodged together where I tried to train 2 adversaries using the same Neural Network and a lot of trial and error to try and get a working policy.
+This is an experiment I bodged together where I tried to train two competitive agents using the same Neural Network and a lot of trial and error to try and get a working policy.
 
 
 

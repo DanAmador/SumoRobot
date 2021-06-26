@@ -8,7 +8,7 @@ Then you'll love stupid car sumo simulation trained with [Unity MLAgents](https:
 
 
 
-This is an experiment I bodged together where I tried to train two competitive agents using the same Neural Network and a lot of trial and error to try and get a working policy.
+This is an experiment I bodged together where I tried to train two competitive agents using the same Neural Network with a lot of trial and error to try and get a working policy.
 
 
 
